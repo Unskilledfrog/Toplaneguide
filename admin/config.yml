@@ -64,11 +64,7 @@ collections:
                 name: "lane"
                 widget: "select"
                 options:
-                  - { label: "Top", value: "top" }
-                  - { label: "Jungle", value: "jungle" }
-                  - { label: "Mid", value: "mid" }
-                  - { label: "ADC", value: "adc" }
-                  - { label: "Support", value: "support" }
+                  - { label: "Top lane", value: "top" }
               - label: "Your champion"
                 name: "champion"
                 widget: "string"
