@@ -1,7 +1,6 @@
 backend:
-  name: github
-  repo: Unskilledfrog/Toplaneguide
-  branch: feature/full-decap-cms
+  name: git-gateway
+  branch: main
 
 site_url: https://lolgameguide.netlify.app
 display_url: https://lolgameguide.netlify.app
@@ -46,6 +45,46 @@ collections:
                 name: "alt"
                 widget: "string"
                 required: false
+
+  - name: "champions"
+    label: "Champions and champion guides"
+    files:
+      - name: "champion_data"
+        label: "Champion roster and guides"
+        file: "content/champions.json"
+        format: "json"
+        fields:
+          - label: "Champions"
+            name: "champions"
+            widget: "list"
+            summary: "{{fields.name}} — {{fields.lane}}"
+            fields:
+              - { label: "Champion name (must match in-game name)", name: "name", widget: "string" }
+              - label: "Lane"
+                name: "lane"
+                widget: "select"
+                options: [ { label: "Top", value: "top" }, { label: "Jungle", value: "jungle" }, { label: "Mid", value: "mid" }, { label: "Bot / ADC", value: "adc" }, { label: "Support", value: "support" } ]
+                default: "top"
+              - label: "Champion class"
+                name: "champion_class"
+                widget: "select"
+                options: [ { label: "Tank", value: "tank" }, { label: "Fighter", value: "fighter" }, { label: "Ranged", value: "ranged" }, { label: "Mage", value: "mage" }, { label: "Assassin", value: "assassin" } ]
+                default: "fighter"
+              - { label: "Deals mostly magic damage", name: "magic_damage", widget: "boolean", default: false, required: false }
+              - { label: "Tank killer strength (0–5)", name: "tank_killer", widget: "number", value_type: "int", min: 0, max: 5, default: 0, required: false }
+              - { label: "Strong early game", name: "strong_early", widget: "boolean", default: false, required: false }
+              - { label: "Scales into late game", name: "scales_late", widget: "boolean", default: false, required: false }
+              - { label: "Pokes from range", name: "ranged_poke", widget: "boolean", default: false, required: false }
+              - { label: "Melee without gap closer", name: "no_gapcloser", widget: "boolean", default: false, required: false }
+              - { label: "Has gap closer / dive", name: "gapcloser", widget: "boolean", default: false, required: false }
+              - { label: "Hide champion", name: "hidden", widget: "boolean", default: false, required: false }
+              - { label: "Early game guide", name: "early_game", widget: "text", required: false }
+              - { label: "Mid game guide", name: "mid_game", widget: "text", required: false }
+              - { label: "Late game guide", name: "late_game", widget: "text", required: false }
+              - { label: "Runes", name: "runes", widget: "text", required: false }
+              - { label: "Starting item", name: "starting_item", widget: "string", required: false }
+              - { label: "Core items", name: "core_items", widget: "text", required: false }
+              - { label: "Summoner spells", name: "summoners", widget: "string", required: false }
 
   - name: "matchups"
     label: "Champion matchups"
