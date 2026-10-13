@@ -1,3 +1,524 @@
 {
-  "champions": []
+  "champions": [
+    {
+      "name": "Aatrox",
+      "lane": "top",
+      "champion_class": "fighter"
+    },
+    {
+      "name": "Akali",
+      "lane": "top",
+      "champion_class": "assassin"
+    },
+    {
+      "name": "Akshan",
+      "lane": "top",
+      "champion_class": "ranged"
+    },
+    {
+      "name": "Ambessa",
+      "lane": "top",
+      "champion_class": "fighter"
+    },
+    {
+      "name": "Anivia",
+      "lane": "top",
+      "champion_class": "mage"
+    },
+    {
+      "name": "Aurelion Sol",
+      "lane": "top",
+      "champion_class": "mage"
+    },
+    {
+      "name": "Aurora",
+      "lane": "top",
+      "champion_class": "mage"
+    },
+    {
+      "name": "Azir",
+      "lane": "top",
+      "champion_class": "mage"
+    },
+    {
+      "name": "Briar",
+      "lane": "top",
+      "champion_class": "fighter"
+    },
+    {
+      "name": "Camille",
+      "lane": "top",
+      "champion_class": "fighter"
+    },
+    {
+      "name": "Cassiopeia",
+      "lane": "top",
+      "champion_class": "mage"
+    },
+    {
+      "name": "Cho'Gath",
+      "lane": "top",
+      "champion_class": "tank"
+    },
+    {
+      "name": "Darius",
+      "lane": "top",
+      "champion_class": "fighter"
+    },
+    {
+      "name": "Diana",
+      "lane": "top",
+      "champion_class": "assassin"
+    },
+    {
+      "name": "Dr. Mundo",
+      "lane": "top",
+      "champion_class": "tank"
+    },
+    {
+      "name": "Ekko",
+      "lane": "top",
+      "champion_class": "assassin"
+    },
+    {
+      "name": "Fiora",
+      "lane": "top",
+      "champion_class": "fighter"
+    },
+    {
+      "name": "Fizz",
+      "lane": "top",
+      "champion_class": "assassin"
+    },
+    {
+      "name": "Galio",
+      "lane": "top",
+      "champion_class": "tank"
+    },
+    {
+      "name": "Gangplank",
+      "lane": "top",
+      "champion_class": "ranged"
+    },
+    {
+      "name": "Garen",
+      "lane": "top",
+      "champion_class": "fighter"
+    },
+    {
+      "name": "Gnar",
+      "lane": "top",
+      "champion_class": "fighter"
+    },
+    {
+      "name": "Gragas",
+      "lane": "top",
+      "champion_class": "fighter"
+    },
+    {
+      "name": "Graves",
+      "lane": "top",
+      "champion_class": "ranged"
+    },
+    {
+      "name": "Gwen",
+      "lane": "top",
+      "champion_class": "fighter"
+    },
+    {
+      "name": "Hecarim",
+      "lane": "top",
+      "champion_class": "fighter"
+    },
+    {
+      "name": "Heimerdinger",
+      "lane": "top",
+      "champion_class": "mage"
+    },
+    {
+      "name": "Illaoi",
+      "lane": "top",
+      "champion_class": "fighter"
+    },
+    {
+      "name": "Irelia",
+      "lane": "top",
+      "champion_class": "fighter"
+    },
+    {
+      "name": "Jarvan IV",
+      "lane": "top",
+      "champion_class": "fighter"
+    },
+    {
+      "name": "Jax",
+      "lane": "top",
+      "champion_class": "fighter"
+    },
+    {
+      "name": "Jayce",
+      "lane": "top",
+      "champion_class": "ranged"
+    },
+    {
+      "name": "K'Sante",
+      "lane": "top",
+      "champion_class": "tank"
+    },
+    {
+      "name": "Karma",
+      "lane": "top",
+      "champion_class": "mage"
+    },
+    {
+      "name": "Kassadin",
+      "lane": "top",
+      "champion_class": "mage"
+    },
+    {
+      "name": "Katarina",
+      "lane": "top",
+      "champion_class": "assassin"
+    },
+    {
+      "name": "Kayle",
+      "lane": "top",
+      "champion_class": "ranged"
+    },
+    {
+      "name": "Kayn",
+      "lane": "top",
+      "champion_class": "fighter"
+    },
+    {
+      "name": "Kennen",
+      "lane": "top",
+      "champion_class": "ranged"
+    },
+    {
+      "name": "Kled",
+      "lane": "top",
+      "champion_class": "fighter"
+    },
+    {
+      "name": "Kog'Maw",
+      "lane": "top",
+      "champion_class": "ranged"
+    },
+    {
+      "name": "Lee Sin",
+      "lane": "top",
+      "champion_class": "fighter"
+    },
+    {
+      "name": "Lillia",
+      "lane": "top",
+      "champion_class": "mage"
+    },
+    {
+      "name": "Lissandra",
+      "lane": "top",
+      "champion_class": "mage"
+    },
+    {
+      "name": "Lucian",
+      "lane": "top",
+      "champion_class": "ranged"
+    },
+    {
+      "name": "Lux",
+      "lane": "top",
+      "champion_class": "mage"
+    },
+    {
+      "name": "Malphite",
+      "lane": "top",
+      "champion_class": "tank"
+    },
+    {
+      "name": "Malzahar",
+      "lane": "top",
+      "champion_class": "mage"
+    },
+    {
+      "name": "Maokai",
+      "lane": "top",
+      "champion_class": "tank"
+    },
+    {
+      "name": "Master Yi",
+      "lane": "top",
+      "champion_class": "fighter"
+    },
+    {
+      "name": "Mel",
+      "lane": "top",
+      "champion_class": "mage"
+    },
+    {
+      "name": "Mordekaiser",
+      "lane": "top",
+      "champion_class": "fighter"
+    },
+    {
+      "name": "Naafiri",
+      "lane": "top",
+      "champion_class": "fighter"
+    },
+    {
+      "name": "Nasus",
+      "lane": "top",
+      "champion_class": "fighter"
+    },
+    {
+      "name": "Neeko",
+      "lane": "top",
+      "champion_class": "mage"
+    },
+    {
+      "name": "Nidalee",
+      "lane": "top",
+      "champion_class": "ranged"
+    },
+    {
+      "name": "Nocturne",
+      "lane": "top",
+      "champion_class": "fighter"
+    },
+    {
+      "name": "Olaf",
+      "lane": "top",
+      "champion_class": "fighter"
+    },
+    {
+      "name": "Ornn",
+      "lane": "top",
+      "champion_class": "tank"
+    },
+    {
+      "name": "Pantheon",
+      "lane": "top",
+      "champion_class": "fighter"
+    },
+    {
+      "name": "Poppy",
+      "lane": "top",
+      "champion_class": "tank"
+    },
+    {
+      "name": "Quinn",
+      "lane": "top",
+      "champion_class": "ranged"
+    },
+    {
+      "name": "Rammus",
+      "lane": "top",
+      "champion_class": "tank"
+    },
+    {
+      "name": "Rek'Sai",
+      "lane": "top",
+      "champion_class": "fighter"
+    },
+    {
+      "name": "Renekton",
+      "lane": "top",
+      "champion_class": "fighter"
+    },
+    {
+      "name": "Rengar",
+      "lane": "top",
+      "champion_class": "assassin"
+    },
+    {
+      "name": "Riven",
+      "lane": "top",
+      "champion_class": "fighter"
+    },
+    {
+      "name": "Rumble",
+      "lane": "top",
+      "champion_class": "mage"
+    },
+    {
+      "name": "Ryze",
+      "lane": "top",
+      "champion_class": "mage"
+    },
+    {
+      "name": "Sejuani",
+      "lane": "top",
+      "champion_class": "tank"
+    },
+    {
+      "name": "Sett",
+      "lane": "top",
+      "champion_class": "fighter"
+    },
+    {
+      "name": "Shen",
+      "lane": "top",
+      "champion_class": "tank"
+    },
+    {
+      "name": "Singed",
+      "lane": "top",
+      "champion_class": "tank"
+    },
+    {
+      "name": "Sion",
+      "lane": "top",
+      "champion_class": "tank"
+    },
+    {
+      "name": "Skarner",
+      "lane": "top",
+      "champion_class": "tank"
+    },
+    {
+      "name": "Smolder",
+      "lane": "top",
+      "champion_class": "ranged"
+    },
+    {
+      "name": "Swain",
+      "lane": "top",
+      "champion_class": "mage"
+    },
+    {
+      "name": "Sylas",
+      "lane": "top",
+      "champion_class": "mage"
+    },
+    {
+      "name": "Syndra",
+      "lane": "top",
+      "champion_class": "mage"
+    },
+    {
+      "name": "Tahm Kench",
+      "lane": "top",
+      "champion_class": "tank"
+    },
+    {
+      "name": "Talon",
+      "lane": "top",
+      "champion_class": "assassin"
+    },
+    {
+      "name": "Teemo",
+      "lane": "top",
+      "champion_class": "ranged"
+    },
+    {
+      "name": "Tristana",
+      "lane": "top",
+      "champion_class": "ranged"
+    },
+    {
+      "name": "Trundle",
+      "lane": "top",
+      "champion_class": "fighter"
+    },
+    {
+      "name": "Tryndamere",
+      "lane": "top",
+      "champion_class": "fighter"
+    },
+    {
+      "name": "Twisted Fate",
+      "lane": "top",
+      "champion_class": "mage"
+    },
+    {
+      "name": "Udyr",
+      "lane": "top",
+      "champion_class": "fighter"
+    },
+    {
+      "name": "Urgot",
+      "lane": "top",
+      "champion_class": "fighter"
+    },
+    {
+      "name": "Varus",
+      "lane": "top",
+      "champion_class": "ranged"
+    },
+    {
+      "name": "Vayne",
+      "lane": "top",
+      "champion_class": "ranged"
+    },
+    {
+      "name": "Veigar",
+      "lane": "top",
+      "champion_class": "mage"
+    },
+    {
+      "name": "Vi",
+      "lane": "top",
+      "champion_class": "fighter"
+    },
+    {
+      "name": "Viktor",
+      "lane": "top",
+      "champion_class": "mage"
+    },
+    {
+      "name": "Vladimir",
+      "lane": "top",
+      "champion_class": "mage"
+    },
+    {
+      "name": "Volibear",
+      "lane": "top",
+      "champion_class": "fighter"
+    },
+    {
+      "name": "Warwick",
+      "lane": "top",
+      "champion_class": "fighter"
+    },
+    {
+      "name": "Xin Zhao",
+      "lane": "top",
+      "champion_class": "fighter"
+    },
+    {
+      "name": "Yasuo",
+      "lane": "top",
+      "champion_class": "fighter"
+    },
+    {
+      "name": "Yone",
+      "lane": "top",
+      "champion_class": "fighter"
+    },
+    {
+      "name": "Yorick",
+      "lane": "top",
+      "champion_class": "fighter"
+    },
+    {
+      "name": "Zac",
+      "lane": "top",
+      "champion_class": "tank"
+    },
+    {
+      "name": "Zed",
+      "lane": "top",
+      "champion_class": "assassin"
+    },
+    {
+      "name": "Ziggs",
+      "lane": "top",
+      "champion_class": "mage"
+    },
+    {
+      "name": "Zyra",
+      "lane": "top",
+      "champion_class": "mage"
+    }
+  ]
 }
