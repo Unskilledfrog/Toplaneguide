@@ -1,7 +1,6 @@
 backend:
-  name: github
-  repo: Unskilledfrog/Toplaneguide
-  branch: feature/full-decap-cms
+  name: git-gateway
+  branch: main
 
 site_url: https://lolgameguide.netlify.app
 display_url: https://lolgameguide.netlify.app
