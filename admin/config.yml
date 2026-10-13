@@ -1,7 +1,7 @@
 backend:
   name: github
   repo: Unskilledfrog/Toplaneguide
-  branch: main
+  branch: feature/full-decap-cms
 
 site_url: https://lolgameguide.netlify.app
 display_url: https://lolgameguide.netlify.app
@@ -44,5 +44,60 @@ collections:
                 widget: "image"
               - label: "Alt text"
                 name: "alt"
+                widget: "string"
+                required: false
+
+  - name: "matchups"
+    label: "Champion matchups"
+    files:
+      - name: "matchup_overrides"
+        label: "Matchup ratings and guides"
+        file: "content/matchups.json"
+        format: "json"
+        fields:
+          - label: "Manual matchup overrides"
+            name: "matchups"
+            widget: "list"
+            summary: "{{fields.champion}} vs {{fields.opponent}} ({{fields.lane}})"
+            fields:
+              - label: "Lane"
+                name: "lane"
+                widget: "select"
+                options:
+                  - { label: "Top lane", value: "top" }
+              - label: "Your champion"
+                name: "champion"
+                widget: "string"
+              - label: "Opponent champion"
+                name: "opponent"
+                widget: "string"
+              - label: "Difficulty rating (1 = easiest, 10 = hardest)"
+                name: "rating"
+                widget: "number"
+                value_type: "int"
+                min: 1
+                max: 10
+              - label: "Why this rating"
+                name: "why"
+                widget: "text"
+                required: false
+              - label: "Game plan"
+                name: "plan"
+                widget: "text"
+                required: false
+              - label: "Runes"
+                name: "runes"
+                widget: "text"
+                required: false
+              - label: "Starting item"
+                name: "starting_item"
+                widget: "string"
+                required: false
+              - label: "First recall / first back"
+                name: "first_back"
+                widget: "string"
+                required: false
+              - label: "Summoner spells"
+                name: "summoners"
                 widget: "string"
                 required: false
