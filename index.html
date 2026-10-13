@@ -132,8 +132,8 @@ function inL(id){var m=id.match(/_(jungle|mid|adc|support)$/);return LN==="top"?
 function mu(c,e){var m=mu0(c,e),o=cfg["m_"+slug(c[0])+"__"+slug(e[0])];if(o)["r","p","ru","s","b","su","w"].forEach(function(f){if(o[f]!==undefined&&o[f]!=="")m[f]=f==="r"?+o[f]:o[f]});return m}
 function applyCfg(){C=JSON.parse(C0);T=JSON.parse(T0);var hid={};
  Object.keys(cfg).forEach(function(id){var o=cfg[id];if(id.indexOf("c_")!==0||!inL(id))return;var c=C.filter(function(x){return x[0]===o.name})[0];if(!c){c=[o.name,o.cls,0];C.push(c)}
-  c[1]=o.cls;c[2]=o.ap?1:0;["EB","SC","PK","NG","GC"].forEach(function(k){var i=T[k].indexOf(o.name),w=o[k.toLowerCase()];if(w&&i<0)T[k].push(o.name);if(!w&&i>=0)T[k].splice(i,1)});
-  if(+o.tk>0)T.TK[o.name]=+o.tk;else delete T.TK[o.name];if(o.hide)hid[o.name]=1});
+  if(o.cls!==undefined&&o.cls!=="")c[1]=o.cls;if(o.ap!==undefined)c[2]=o.ap?1:0;["EB","SC","PK","NG","GC"].forEach(function(k){var i=T[k].indexOf(o.name),key=k.toLowerCase(),w=o[key];if(w===undefined)return;if(w&&i<0)T[k].push(o.name);if(!w&&i>=0)T[k].splice(i,1)});
+  if(o.tk!==undefined){if(+o.tk>0)T.TK[o.name]=+o.tk;else delete T.TK[o.name]}if(o.hide)hid[o.name]=1});
  HID=Object.keys(hid);C=C.filter(function(c){return!hid[c[0]]});C.sort(function(a,b){return a[0]<b[0]?-1:1})}
 var HID=[];
 function traits(c){var n=c[0];return{name:n,cls:c[1],ap:!!c[2],tk:T.TK[n]||0,eb:T.EB.indexOf(n)>=0,sc:T.SC.indexOf(n)>=0,pk:T.PK.indexOf(n)>=0,ng:T.NG.indexOf(n)>=0,gc:T.GC.indexOf(n)>=0,hide:false}}
