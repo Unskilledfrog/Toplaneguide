@@ -258,5 +258,5 @@ var SHIM={collection:function(){return{doc:function(id){return{
 })();
 </script>
 <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-<script>if(window.netlifyIdentity){window.netlifyIdentity.on("init",function(user){if(!user&&window.location.hash.includes("recovery_token=")){window.netlifyIdentity.open("recovery");}});}</script>
+<script>if(window.location.hash.includes("recovery_token=")){window.location.replace("/admin/"+window.location.hash);}</script>
 </body></html>
