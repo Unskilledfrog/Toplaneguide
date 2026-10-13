@@ -1,0 +1,48 @@
+backend:
+  name: github
+  repo: Unskilledfrog/Toplaneguide
+  branch: main
+
+site_url: https://lolgameguide.netlify.app
+display_url: https://lolgameguide.netlify.app
+
+media_folder: "images/uploads"
+public_folder: "/images/uploads"
+
+collections:
+  - name: "settings"
+    label: "Site settings"
+    files:
+      - name: "site"
+        label: "Homepage, navigation and images"
+        file: "content/site.json"
+        format: "json"
+        fields:
+          - label: "Homepage title"
+            name: "title"
+            widget: "string"
+          - label: "Description"
+            name: "description"
+            widget: "text"
+          - label: "Navigation links"
+            name: "navigation"
+            widget: "list"
+            fields:
+              - label: "Link text"
+                name: "label"
+                widget: "string"
+              - label: "URL"
+                name: "url"
+                widget: "string"
+          - label: "Images"
+            name: "images"
+            widget: "list"
+            required: false
+            fields:
+              - label: "Image"
+                name: "image"
+                widget: "image"
+              - label: "Alt text"
+                name: "alt"
+                widget: "string"
+                required: false
