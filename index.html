@@ -44,9 +44,17 @@ dt{color:var(--mut);font-size:.9rem}dd{margin:0}
 .gd{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px 14px}.hide{display:none}
 
 .admin-link{position:fixed;right:16px;bottom:16px;z-index:20;display:inline-flex;align-items:center;gap:8px;padding:11px 16px;border-radius:999px;background:var(--fg);color:var(--bg);text-decoration:none;font-weight:700;box-shadow:0 4px 18px rgba(0,0,0,.2);border:2px solid var(--bg)}.admin-link:hover{transform:translateY(-1px);opacity:.92}.admin-link:focus-visible{outline:3px solid var(--ac);outline-offset:3px}
+
+#cms-nav{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+#cms-nav a{display:inline-block;padding:6px 10px;border:1px solid var(--line);border-radius:8px;color:var(--fg);text-decoration:none;background:var(--card)}
+#cms-images{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0}
+#cms-images figure{margin:0;max-width:220px}
+#cms-images img{display:block;width:100%;height:auto;max-height:180px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
+#cms-images figcaption{font-size:.85rem;color:var(--mut);margin-top:4px}
 </style></head><body><div class="w">
 <h1 id="h1">Lane matchup guide</h1>
-<p class="sub">Ratings run from 1 (easiest matchup) to 10 (hardest). Pick your lane, then choose the champion you are playing. You get a guide for them, plus how to play them against every top laner, with runes and items.</p>
+<p class="sub" id="site-description">Ratings run from 1 (easiest matchup) to 10 (hardest). Pick your lane, then choose the champion you are playing. You get a guide for them, plus how to play them against every top laner, with runes and items.</p>
+<nav id="cms-nav" aria-label="Main navigation"></nav><div id="cms-images" aria-label="Site images"></div>
 <div class="gauge" aria-hidden="true"></div><div class="gl"><span>1 = easiest matchup</span><span>10 = hardest matchup</span></div>
 <div id="own" class="ow hide">Edit mode is on. Edits are kept in this browser until you press Download updated site, then upload that file to your host to publish them. <div class="bs"><button class="back" id="dl">Download updated site</button><button class="back" id="dc">Discard my edits</button></div></div><section id="lanes"><h2>Which lane are you playing?</h2><div class="grid" id="lg"></div></section><section id="pick" class="hide"><button class="back" id="bl">Change lane</button><h2>Who are you playing?</h2><input id="pq" type="search" placeholder="Search your champion" aria-label="Search your champion"><div class="grid" id="g"></div><div id="adm"></div></section>
 <section id="out" class="hide"><button class="back" id="bk">Change champion</button><h2 id="ttl"></h2><p class="sub" id="note"></p><div class="gd" id="gd"></div>
@@ -181,4 +189,56 @@ var SHIM={collection:function(){return{doc:function(id){return{
   IS=true;db=SHIM;$("own").classList.remove("hide");$("dl").onclick=dl;
   $("dc").onclick=function(){try{localStorage.removeItem("tlg_draft")}catch(e){}location.reload()}}
  window.addEventListener("hashchange",function(){location.reload()});applyCfg();refresh()})();
-</script><a class="admin-link" href="/admin/" aria-label="Öppna adminpanelen">⚙ Admin</a></body></html>
+</script><a class="admin-link" href="/admin/" aria-label="Öppna adminpanelen">⚙ Admin</a>
+<script>
+/* Decap CMS-managed site settings. Existing matchup data and functionality stay unchanged. */
+(function(){
+  fetch('/content/site.json', {cache:'no-store'})
+    .then(function(r){ if(!r.ok) throw new Error('CMS settings not found'); return r.json(); })
+    .then(function(data){
+      if (typeof data.title === 'string' && data.title.trim()) {
+        var h = document.getElementById('h1');
+        if (h) h.textContent = data.title;
+        document.title = data.title + ' | Lane Matchup Guide';
+      }
+      if (typeof data.description === 'string') {
+        var desc = document.getElementById('site-description');
+        if (desc) desc.textContent = data.description;
+      }
+      var nav = document.getElementById('cms-nav');
+      if (nav && Array.isArray(data.navigation)) {
+        nav.textContent = '';
+        data.navigation.forEach(function(item){
+          if (!item || typeof item.label !== 'string' || typeof item.url !== 'string') return;
+          var url = item.url.trim();
+          if (!url || /^\s*javascript:/i.test(url)) return;
+          var a = document.createElement('a');
+          a.textContent = item.label;
+          a.href = url;
+          nav.appendChild(a);
+        });
+      }
+      var gallery = document.getElementById('cms-images');
+      if (gallery && Array.isArray(data.images)) {
+        gallery.textContent = '';
+        data.images.forEach(function(item){
+          if (!item || typeof item.image !== 'string' || !item.image.trim()) return;
+          var figure = document.createElement('figure');
+          var img = document.createElement('img');
+          img.src = item.image;
+          img.alt = typeof item.alt === 'string' ? item.alt : '';
+          img.loading = 'lazy';
+          figure.appendChild(img);
+          if (img.alt) {
+            var caption = document.createElement('figcaption');
+            caption.textContent = img.alt;
+            figure.appendChild(caption);
+          }
+          gallery.appendChild(figure);
+        });
+      }
+    })
+    .catch(function(){ /* Keep the existing site usable if CMS settings are unavailable. */ });
+})();
+</script>
+</body></html>
