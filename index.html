@@ -188,7 +188,22 @@ var SHIM={collection:function(){return{doc:function(id){return{
  if(location.hash==="#edit"){try{var dr=localStorage.getItem("tlg_draft");if(dr)cfg=JSON.parse(dr)}catch(e){}
   IS=true;db=SHIM;$("own").classList.remove("hide");$("dl").onclick=dl;
   $("dc").onclick=function(){try{localStorage.removeItem("tlg_draft")}catch(e){}location.reload()}}
- window.addEventListener("hashchange",function(){location.reload()});applyCfg();refresh()})();
+ window.addEventListener("hashchange",function(){location.reload()});
+ fetch("/content/matchups.json",{cache:"no-store"})
+  .then(function(r){if(!r.ok)throw new Error("Matchup overrides unavailable");return r.json()})
+  .then(function(data){
+   if(!data||!Array.isArray(data.matchups))return;
+   data.matchups.forEach(function(item){
+    if(!item||typeof item.champion!=="string"||typeof item.opponent!=="string"||item.lane!==LN)return;
+    var id="m_"+slug(item.champion)+"__"+slug(item.opponent),o={};
+    if(item.rating!==undefined&&item.rating!==null&&item.rating!=="")o.r=Math.max(1,Math.min(10,Number(item.rating)));
+    [["why","w"],["plan","p"],["runes","ru"],["starting_item","s"],["first_back","b"],["summoners","su"]].forEach(function(pair){if(typeof item[pair[0]]==="string"&&item[pair[0]].trim())o[pair[1]]=item[pair[0]]});
+    cfg[id]=Object.assign(cfg[id]||{},o);
+   });
+  })
+  .catch(function(){})
+  .then(function(){applyCfg();refresh()});
+})();
 </script><a class="admin-link" href="/admin/" aria-label="Öppna adminpanelen">⚙ Admin</a>
 <script>
 /* Decap CMS-managed site settings. Existing matchup data and functionality stay unchanged. */
