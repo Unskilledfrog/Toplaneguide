@@ -121,8 +121,7 @@ function sc(x,y){var v=EO[x[1]+">"+y[1]]||0,w=[];
  if(T.GC.indexOf(x[0])>=0&&(y[1]==="ranged"||y[1]==="mage")){v+=2;w.push(x[0]+" can jump onto "+y[0])}
  return[v,w]}
 function mu0(c,e){
- if(c[0]==="Rumble"&&R[e[0]]){var r=R[e[0]];return{r:RS[e[0]],p:r[1],ru:r[2],s:r[3],b:r[4],su:r[5],w:""}}
- var k=K[c[1]],a=sc(e,c),b=sc(c,e),d=Math.max(1,Math.min(10,5+a[0]-b[0])),w=[];
+  var k=K[c[1]],a=sc(e,c),b=sc(c,e),d=Math.max(1,Math.min(10,5+a[0]-b[0])),w=[];
  if(c[0]===e[0])d=5;
  if(a[1].length)w.push("Against you: "+a[1].join("; ")+".");if(b[1].length)w.push("For you: "+b[1].join("; ")+".");
  return{r:d,p:XP(c,e),ru:k[4],s:d>=7&&LN==="top"?"Doran's Shield + Health Potion":k[5],b:e[2]?BM:BA,su:k[7],w:w.join(" ")}}
@@ -157,10 +156,10 @@ function editGuide(){var g=cfg["g_"+slug(me[0])],k=K[me[1]];form("Guide for "+me
 var TF=[["name","Champion name","x",1],["cls","Class","s",["tank","fighter","ranged","mage","assassin"]],["ap","Deals mostly magic damage","b"],["tk","Tank killer strength (0 to 5)","n",[0,5]],["eb","Strong early game","b"],["sc","Weak early game, scales later","b"],["pk","Pokes from range","b"],["ng","Melee with no gap closer","b"],["gc","Can jump onto squishy targets","b"],["hide","Hide this champion","b"]];
 function editTraits(c){form(c[0]+" traits",TF,traits(c),"c_"+slug(c[0]),"Reset to default")}
 function addChamp(){var t=traits(["",  "fighter",0]);form("Add champion",[["name","Champion name","x"]].concat(TF.slice(1)),t,function(d){return"c_"+slug(d.name)})}
-function draw(){if(!me)return;var k=K[me[1]],g=cfg["g_"+slug(me[0])];$("ttl").textContent="Playing "+me[0];var gd=$("gd");gd.textContent="";var dl=el("dl");
- if(g){$("note").textContent="Custom guide for "+me[0]+".";[["Early game",g.e],["Mid game",g.m],["Late game",g.l],["Runes",g.ru],["Starting item",g.st],["Core items",g.co],["Summoners",g.su]].forEach(function(p){dl.appendChild(el("dt",0,p[0]));dl.appendChild(el("dd",0,p[1]))})}
+function corePrinciples(c){var name=c[0],cls=c[1],base={"tank":[["Core principle","Survive early lane and create reliable engage or peel later."],["Trading","Trade when your defensive tool or crowd control is available. Avoid long fights with sustained-damage duelists when behind."],["Team fights","Engage when teammates can follow, or save crowd control to protect your carries."]],"fighter":[["Core principle","Manage key cooldowns and the wave so you choose when extended trades happen."],["Trading","Look for a trade after the opponent spends a key ability; extend only when your kit and health favor it."],["Team fights","Flank or pressure a side lane when appropriate. Avoid walking into several enemies without vision or an exit."]],"ranged":[["Core principle","Use range to pressure last-hits while staying outside all-in range."],["Trading","Poke when the opponent goes for a minion, while tracking their gap closer and your escape cooldown."],["Team fights","Keep a safe firing angle and reposition before divers reach you."]],"mage":[["Core principle","Use range, spell rotations and wave control to create safe pressure."],["Trading","Poke when the opponent is committed to last-hitting. If your key spell misses, play safer until it returns."],["Team fights","Control choke points and follow up on crowd control. Keep defensive spells for divers."]],"assassin":[["Core principle","Look for short burst windows and movement opportunities rather than every extended fight."],["Trading","Wait for a defensive ability to be used, then commit with a clear exit plan."],["Team fights","Approach from fog or a flank and target isolated squishy champions; avoid entering first into grouped enemies."]]};var p=(base[cls]||base.fighter).map(function(x){return x.slice()});if(name==="Ornn")p=[["Core principle","Play patiently in early levels. Your passive lets you buy items in lane; your team-wide item upgrades add value as the game progresses."],["Trading","Use Q to slow and create a pillar, then threaten E when a pillar or wall lines up. W helps you resist crowd control and apply Brittle; follow with an empowered attack when safe."],["Team fights","Look for a clear R angle and recast to knock enemies up. Coordinate with your team, and upgrade allies' eligible items when safe."]];return p}function draw(){if(!me)return;var k=K[me[1]]||K.fighter,g=cfg["g_"+slug(me[0])];$("ttl").textContent="Playing "+me[0];var gd=$("gd");gd.textContent="";var dl=el("dl");
+ if(g){$("note").textContent="Champion-specific guide with your core principles.";[["Early game",g.e],["Mid game",g.m],["Late game",g.l],["Runes",g.ru],["Starting item",g.st],["Core items",g.co],["Summoners",g.su]].forEach(function(p){dl.appendChild(el("dt",0,p[0]));dl.appendChild(el("dd",0,p[1]))})}
  else if(me[0]==="Rumble"){$("note").textContent="Champion-specific guide with your core principles.";P.forEach(function(p){dl.appendChild(el("dt",0,p[0]));dl.appendChild(el("dd",0,p[1]))})}
- else{$("note").textContent="Class guide ("+k[0]+"). It does not include "+me[0]+"'s own ability tips.";[["Early game",k[1]],["Mid game",k[2]],["Late game",k[3]],["Runes",k[4]],["Starting item",k[5]],["Core items",k[6]],["Summoners",k[7]]].forEach(function(p){dl.appendChild(el("dt",0,p[0]));dl.appendChild(el("dd",0,p[1]))})}
+ else{$("note").textContent="Champion-specific guide with your core principles.";[["Early game",k[1]],["Mid game",k[2]],["Late game",k[3]],["Runes",k[4]],["Starting item",k[5]],["Core items",k[6]],["Summoners",k[7]]].forEach(function(p){dl.appendChild(el("dt",0,p[0]));dl.appendChild(el("dd",0,p[1]))});corePrinciples(me).forEach(function(p){dl.appendChild(el("dt",0,p[0]));dl.appendChild(el("dd",0,p[1]))})}
  gd.appendChild(dl);if(IS&&db){var b1=el("button","back eb","Edit guide"),b2=el("button","back eb","Edit traits");b1.onclick=editGuide;b2.onclick=function(){editTraits(me)};gd.appendChild(b1);gd.appendChild(b2)}render()}
 function choose(c){me=c;$("pick").classList.add("hide");$("out").classList.remove("hide");$("q").value="";$("f").value="";$("so").value="az";draw();window.scrollTo(0,0)}
 function refresh(){if(me){me=C.filter(function(c){return c[0]===me[0]})[0]||null;if(!me){$("out").classList.add("hide");$("pick").classList.remove("hide")}else draw()}buildGrid()}
@@ -169,7 +168,7 @@ function render(){var q=$("q").value.trim().toLowerCase(),f=$("f").value,so=$("s
  C.forEach(function(e){if(q&&e[0].toLowerCase().indexOf(q)<0)return;var m=mu(me,e);if(f&&band(m.r)!==f)return;a.push([e,m])});
  if(so==="hard")a.sort(function(x,y){return y[1].r-x[1].r});if(so==="easy")a.sort(function(x,y){return x[1].r-y[1].r});
  a.forEach(function(t){var e=t[0],m=t[1],d=el("details",band(m.r)),s=el("summary");s.appendChild(el("b",0,"vs "+e[0]));s.appendChild(el("span","ty",K[e[1]][0]));s.appendChild(el("span","rt","Difficulty "+m.r+"/10"));d.appendChild(s);
-  var dl=el("dl");rows.forEach(function(r){if(!m[r[1]])return;dl.appendChild(el("dt",0,r[0]));dl.appendChild(el("dd",0,m[r[1]]))});d.appendChild(dl);if(IS&&db){var eb=el("button","back eb","Edit this matchup");eb.onclick=function(){editMatchup(e)};d.appendChild(eb)}L.appendChild(d)});
+  var dl=el("dl");rows.forEach(function(r){if(!m[r[1]])return;dl.appendChild(el("dt",0,r[0]));dl.appendChild(el("dd",0,m[r[1]]))});d.appendChild(dl);var statsLink=el("a","stats-link","View live matchup stats / counters ↗");statsLink.href="https://u.gg/lol/champions/"+encodeURIComponent(e[0].toLowerCase().replace(/\\s+/g,"-"))+"/counter";statsLink.target="_blank";statsLink.rel="noopener noreferrer";statsLink.style.display="inline-block";statsLink.style.margin="0 12px 12px";d.appendChild(statsLink);if(IS&&db){var eb=el("button","back eb","Edit this matchup");eb.onclick=function(){editMatchup(e)};d.appendChild(eb)}L.appendChild(d)});
  $("cnt").textContent="("+a.length+")";if(!a.length)L.appendChild(el("p","sub","No champion matches. Clear the search or reset the filter."))}
 $("pq").addEventListener("input",buildGrid);$("q").addEventListener("input",render);$("f").addEventListener("change",render);$("so").addEventListener("change",render);
 $("bk").onclick=function(){me=null;$("out").classList.add("hide");$("pick").classList.remove("hide");window.scrollTo(0,0)};C0=JSON.stringify(C);T0=JSON.stringify(T);buildLanes();
@@ -259,4 +258,106 @@ var SHIM={collection:function(){return{doc:function(id){return{
 </script>
 <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 <script>if(window.location.hash.includes("recovery_token=")){window.location.replace("/admin/"+window.location.hash);}</script>
+
+<script>
+/* Champion ability reference and Riot's official difficulty metadata. */
+(function(){
+  var championData = {};
+  var statVersion = "";
+  var loadingName = "";
+  function safeName(s){return String(s||"").toLowerCase().replace(/[^a-z0-9]/g,"")}
+  function htmlText(s){var d=document.createElement("div");d.innerHTML=String(s||"");return (d.textContent||d.innerText||"").replace(/\s+/g," ").trim()}
+  function addSection(){
+    if(!document.getElementById("out") || document.getElementById("ability-reference")) return;
+    var anchor=document.getElementById("gd");
+    if(!anchor)return;
+    var section=document.createElement("section");
+    section.id="ability-reference";
+    section.innerHTML='<h2>Ability guide</h2><p class="sub">Ability descriptions and champion difficulty are loaded from Riot Games Data Dragon. Tips explain practical use, but check current in-game tooltips for exact numbers.</p><div id="ability-content" class="ability-grid"><p class="sub">Loading champion abilities…</p></div><div id="champion-stats" class="gd"></div>';
+    anchor.parentNode.insertBefore(section,anchor.nextSibling);
+  }
+  function tailoredTip(champion,label,spell){
+    var text=htmlText((spell&&spell.description||"")+" "+(spell&&spell.tooltip||"")).toLowerCase();
+    if(/dash|blink|leap|teleport|rush|charge/.test(text))return "Mobility tool: use it to dodge an important enemy ability or reposition for a trade. If it is your only escape, avoid spending it aggressively while the enemy jungler could be nearby.";
+    if(/stun|root|knock.?up|suppress|snare|immobiliz/.test(text))return "Crowd-control tool: try to land it when the opponent has used their dodge or movement ability. It is especially valuable when your jungler can follow up; avoid throwing it away for low-value poke.";
+    if(/shield|damage reduction|block damage|invulnerab/.test(text))return "Defensive tool: time it for the enemy's main burst or crowd-control window, rather than activating it after most of the damage has already landed.";
+    if(/heal|healing|restore.*health|life steal|omnivamp/.test(text))return "Sustain tool: get value from it during a real trade or after taking meaningful damage. Check whether it needs you to hit a champion, minion or monster to trigger its full effect.";
+    if(/invisible|stealth|camouflage|untargetable/.test(text))return "Use the concealment or untargetability to break enemy targeting, dodge a key spell or change your approach. Keep track of detection and area effects that can still reveal or hit you.";
+    if(/execute|missing health|below.*health|kill.*threshold/.test(text))return "Finisher: save it until the target is in its effective kill range, unless using it earlier guarantees a key setup. Watch the target's health and defensive cooldowns before committing.";
+    if(/mark|marked|detonate|consume/.test(text))return "Setup and payoff: apply the mark or effect first, then follow with the ability or attack that triggers its bonus. Avoid breaking the sequence by using the payoff too early.";
+    if(/slow|slows|movement speed/.test(text))return "Kiting and chase tool: use the slow to keep the opponent in range or to create space while retreating. It is strongest when paired with your follow-up damage, not when the enemy is already safely out of reach.";
+    if(/projectile|missile|skill.?shot|line of|fires a/.test(text))return "Aim for the opponent's movement path rather than their current position. Try to cast after they spend a dash or while they are last-hitting, and account for minions if the ability can be blocked.";
+    if(/trap|brush|terrain|wall|zone|area/.test(text))return "Area-control tool: place or use it where the enemy wants to walk—around minions, choke points or objectives. Think about how it changes their available path, not only its direct damage.";
+    if(/summon|pet|turret|soldier|clone|spirit/.test(text))return "Summon or deploy it where it can keep affecting the fight while you stay safe. Check its duration and positioning, and avoid wasting it just before an objective or a likely all-in.";
+    if(label==="R")return "Ultimate: use it around its strongest condition—such as a crowd-control setup, a vulnerable target, or a team fight. Track the cooldown after using it and tell your team when it is available again.";
+    if(label==="Passive")return "Passive: learn the trigger and the reward. Build your trades around activating it reliably, and check whether it resets, stacks or has an internal cooldown.";
+    if(label==="Q")return "Usually your most frequently used basic ability: learn its range and cooldown, then use it to secure farm or start a trade when the opponent cannot punish you.";
+    if(label==="W")return "Before using this, identify whether it is your damage, defense or setup tool. Keeping it available can discourage the enemy from engaging even when you never cast it.";
+    if(label==="E")return "Treat this as a key part of your trading pattern. If it provides mobility or an escape, think twice before spending it when the enemy jungler is missing.";
+    return "Check the ability's range, cast time and cooldown in practice tool. Try it in a short trade first, then commit when you know the enemy cannot immediately punish the cooldown.";
+  }
+  function renderChampion(name){
+    addSection();
+    var root=document.getElementById("ability-content"),stats=document.getElementById("champion-stats");
+    if(!root||!stats)return;
+    var key=safeName(name),data=championData[key];
+    if(!data){root.textContent="No Riot ability data found for "+name+".";return}
+    root.textContent="";
+    var spells=[{label:"Passive",spell:data.passive,tip:"Look for the condition that activates this effect. Plan trades around when it is ready, and avoid wasting its value on low-impact targets."}];
+    (data.spells||[]).forEach(function(sp,i){
+      var tips=[
+        "Use this as your main trade or poke tool when the opponent cannot easily punish you. Track its cooldown before committing again.",
+        "Check whether this ability provides damage, crowd control, a shield, healing or mobility. Save it for the effect that matters most in the matchup.",
+        "Treat this as a defensive or setup tool if it gives you an escape, crowd control or protection. Avoid spending it just for small poke when danger is nearby.",
+        "Use your ultimate around its strongest condition—such as a crowd-control setup, low-health target, team fight or objective. Communicate the cooldown after using it."
+      ];
+      spells.push({label:["Q","W","E","R"][i]||("Ability "+(i+1)),spell:sp,tip:tips[i]||tips[1]});
+    });
+    spells.forEach(function(item){
+      if(!item.spell)return;
+      var card=document.createElement("article");card.className="ability-card";
+      var heading=document.createElement("h3");heading.textContent=item.label+" — "+(item.spell.name||"");card.appendChild(heading);
+      var desc=document.createElement("p");desc.textContent=htmlText(item.spell.description||item.spell.tooltip||"Description unavailable.");card.appendChild(desc);
+      var tip=document.createElement("p");tip.className="ability-tip";tip.textContent="How to use it: "+tailoredTip(name,item.label,item.spell);card.appendChild(tip);
+      if(item.spell.cooldown&&item.spell.cooldown.length){var cd=document.createElement("p");cd.className="ability-meta";cd.textContent="Base cooldown by rank: "+item.spell.cooldown.join(" / ")+" sec";card.appendChild(cd)}
+      root.appendChild(card);
+    });
+    var diff=data.info&&typeof data.info.difficulty==="number"?data.info.difficulty:null;
+    stats.textContent="";
+    var title=document.createElement("h3");title.textContent="Champion difficulty";stats.appendChild(title);
+    var p=document.createElement("p");p.textContent=diff===null?"Riot difficulty rating unavailable.":"Riot Data Dragon difficulty: "+diff+"/10 (champion learning complexity; not matchup difficulty).";stats.appendChild(p);
+    var link=document.createElement("a");link.href="https://u.gg/lol/champions/"+encodeURIComponent(name.toLowerCase().replace(/\s+/g,"-"))+"/counter";link.target="_blank";link.rel="noopener noreferrer";link.textContent="Live counters and matchup win rates on U.GG ↗";link.className="stats-link";stats.appendChild(link);
+  }
+  function load(){
+    var current=Array.isArray(window.C)?window.C.find(function(c){return c&&c[0]===window.me?.[0]}):null;
+    var name=current?current[0]:(document.getElementById("ttl")?document.getElementById("ttl").textContent.replace(/^Playing\s+/,""):"");
+    if(!name)return;
+    var d=Object.values(championData).find(function(x){return x.name===name});
+    if(d){renderChampion(name);return}
+    if(loadingName===name)return;
+    loadingName=name;
+    fetch("https://ddragon.leagueoflegends.com/api/versions.json").then(function(r){return r.json()}).then(function(v){
+      statVersion=v[0];
+      return fetch("https://ddragon.leagueoflegends.com/cdn/"+statVersion+"/data/en_US/champion.json");
+    }).then(function(r){return r.json()}).then(function(index){
+      var entry=Object.values(index.data||{}).find(function(x){return x.name===name});
+      if(!entry)throw new Error("Champion not found");
+      return fetch("https://ddragon.leagueoflegends.com/cdn/"+statVersion+"/data/en_US/champion/"+entry.id+".json");
+    }).then(function(r){return r.json()}).then(function(detail){
+      Object.values(detail.data||{}).forEach(function(x){championData[safeName(x.name)]=x});
+      renderChampion(name);
+    }).catch(function(){
+      var root=document.getElementById("ability-content");
+      if(root)root.textContent="Could not load Riot champion data right now. Try again shortly.";
+    }).then(function(){loadingName="";});
+  }
+  var style=document.createElement("style");
+  style.textContent="#ability-reference{margin-top:28px}.ability-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;margin-top:12px}.ability-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}.ability-card h3,.gd h3{margin:0 0 8px;color:var(--ac);font-size:1.15rem}.ability-card p{margin:8px 0}.ability-tip{border-top:1px solid var(--line);padding-top:8px}.ability-meta{color:var(--mut);font-size:.88rem}.stats-link{display:inline-block;color:var(--ac);font-weight:600;margin:4px 0}.ability-card{min-width:0}";
+  document.head.appendChild(style);
+  var oldChoose=window.choose;
+  if(typeof oldChoose==="function")window.choose=function(c){oldChoose(c);setTimeout(load,0)};
+  var oldDraw=window.draw;
+  if(typeof oldDraw==="function")window.draw=function(){oldDraw();setTimeout(load,0)};
+})();
+</script>
 </body></html>
