@@ -211,11 +211,18 @@ function renderChampionExtras(name,container){
    grid.appendChild(card);
   });
   root.appendChild(extraEl("h3",null,"Ability-by-ability tips"));root.appendChild(grid);
-  var core=extraEl("div","extra-card");core.appendChild(extraEl("h3",null,name+" — core principles"));
-  var tips=ch.allytips||[];
-  core.appendChild(extraEl("p",null,(tips[0]?cleanTip(tips[0])+" ":"")+"Control the wave around your champion’s strongest cooldown and level windows. Before trading, check whether your escape/defensive spell is available and whether the opponent has spent their engage or crowd-control ability."));
-  if(tips[1])core.appendChild(extraEl("p",null,"Another champion-specific principle: "+cleanTip(tips[1])));
-  core.appendChild(extraEl("p","extra-muted","Ability tips and Riot’s difficulty rating are drawn from the current Data Dragon champion file."));root.appendChild(core);
+  var core=extraEl("div","extra-card");core.appendChild(extraEl("h3",null,name+" — champion-specific core principles"));
+  var tips=ch.allytips||[], spells=ch.spells||[], all=spells.map(function(sp,i){return {sp:sp,i:i,text:(sp.name+" "+sp.description+" "+sp.tooltip).toLowerCase()}}), find=function(re){return all.find(function(x){return re.test(x.text)})};
+  var engage=find(/dash|leap|blink|charge|lunge|rush|jump|engage/), cc=find(/stun|root|knock.?up|immobiliz|suppress|fear|taunt|charm|snare/), defense=find(/shield|heal|restore health|damage reduction|invulnerable|untargetable/), poke=find(/projectile|missile|skillshot|range|slow|throw|fires? a/), reset=find(/reset|refresh|cooldown is reduced|recall/), ult=all[3];
+  core.appendChild(extraEl("p",null,(tips[0]?cleanTip(tips[0])+" ":"")+"**Game plan:** build trades around "+(cc?"landing "+["Q","W","E","R"][cc.i]+" ("+cc.sp.name+")":engage?"using "+["Q","W","E","R"][engage.i]+" ("+engage.sp.name+")":"your highest-impact ability")+" rather than spending every spell at once. Check the wave and enemy jungler before committing."));
+  if(engage)core.appendChild(extraEl("p",null,"**Commit or escape — "+["Q","W","E","R"][engage.i]+" · "+engage.sp.name+":** "+cleanTip(engage.sp.description||engage.sp.tooltip)+". Keep this available when the enemy can punish your forward movement."));
+  if(cc)core.appendChild(extraEl("p",null,"**Trade setup — "+["Q","W","E","R"][cc.i]+" · "+cc.sp.name+":** use its crowd control to make your follow-up reliable; if it misses, shorten the trade and wait for the next window."));
+  if(defense)core.appendChild(extraEl("p",null,"**Survival window — "+["Q","W","E","R"][defense.i]+" · "+defense.sp.name+":** hold this for the enemy’s burst or all-in where possible, instead of using it for trivial poke."));
+  if(poke)core.appendChild(extraEl("p",null,"**Range and spacing — "+["Q","W","E","R"][poke.i]+" · "+poke.sp.name+":** pressure from the range this spell gives you, and watch whether minions or terrain block its path."));
+  if(reset)core.appendChild(extraEl("p",null,"**Combo window — "+["Q","W","E","R"][reset.i]+" · "+reset.sp.name+":** look for the reset/refresh condition and plan the next cast before starting the combo."));
+  if(ult)core.appendChild(extraEl("p",null,"**Level 6 and teamfights — R · "+ult.sp.name+":** "+cleanTip(ult.sp.description||ult.sp.tooltip)+". Track the opponent’s key cooldowns before using this as your all-in signal."));
+  if(tips[1])core.appendChild(extraEl("p",null,"**Riot champion tip:** "+cleanTip(tips[1])));
+  core.appendChild(extraEl("p","extra-muted","These principles are assembled from this champion’s own ability descriptions and Riot tips; cooldowns shown are base values and change with ability haste."));root.appendChild(core);
  }).catch(function(){if(root.isConnected)loading.textContent="Could not load Riot’s champion file. Check your connection and reload; ability data is not being guessed."});
 }
 function renderCooldownExplainer(detail,ownName,enemyName){
@@ -227,7 +234,9 @@ function renderCooldownExplainer(detail,ownName,enemyName){
   if(!box.isConnected)return;
   [[ownName,champs[0],"Your champion"],[enemyName,champs[1],"Opponent"]].forEach(function(item){
    var card=extraEl("div","extra-card");card.appendChild(extraEl("h3",null,item[2]+": "+item[0]));
-   (item[1].spells||[]).forEach(function(sp,i){card.appendChild(extraEl("p",null,["Q","W","E","R"][i]+" — "+sp.name+": "+(sp.cooldown||[]).join(" / ")+" sec base cooldown."))});
+   var spells=item[1].spells||[], ranked=spells.map(function(sp,i){var t=(sp.name+" "+sp.description+" "+sp.tooltip).toLowerCase(),score=(i===3?2:0)+(/stun|root|knock.?up|suppress|fear|taunt|charm|immobiliz/.test(t)?5:0)+(/dash|leap|blink|untargetable|invulnerable|shield|heal/.test(t)?3:0)+(/execute|reset|mark|detonate|empowered|true damage/.test(t)?2:0);return {sp:sp,i:i,score:score}}).sort(function(a,b){return b.score-a.score});
+   if(ranked.length){var key=ranked[0],letter=["Q","W","E","R"][key.i];card.appendChild(extraEl("p",null,"KEY ABILITY TO WATCH: "+letter+" — "+key.sp.name+". "+cleanTip(key.sp.description||key.sp.tooltip)+". Watch for its animation/cast, then punish the cooldown if it misses or is used on the wave."));}
+   spells.forEach(function(sp,i){card.appendChild(extraEl("p",null,["Q","W","E","R"][i]+" — "+sp.name+": "+(sp.cooldown||[]).join(" / ")+" sec base cooldown."))});
    grid.appendChild(card);
   });
  }).catch(function(){grid.appendChild(extraEl("p","extra-muted","Could not load spell cooldowns for this matchup."))});
