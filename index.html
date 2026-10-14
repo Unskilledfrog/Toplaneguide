@@ -156,7 +156,7 @@ function editGuide(){var g=cfg["g_"+slug(me[0])],k=K[me[1]];form("Guide for "+me
 var TF=[["name","Champion name","x",1],["cls","Class","s",["tank","fighter","ranged","mage","assassin"]],["ap","Deals mostly magic damage","b"],["tk","Tank killer strength (0 to 5)","n",[0,5]],["eb","Strong early game","b"],["sc","Weak early game, scales later","b"],["pk","Pokes from range","b"],["ng","Melee with no gap closer","b"],["gc","Can jump onto squishy targets","b"],["hide","Hide this champion","b"]];
 function editTraits(c){form(c[0]+" traits",TF,traits(c),"c_"+slug(c[0]),"Reset to default")}
 function addChamp(){var t=traits(["",  "fighter",0]);form("Add champion",[["name","Champion name","x"]].concat(TF.slice(1)),t,function(d){return"c_"+slug(d.name)})}
-function draw(){if(!me)return;var k=K[me[1]],g=cfg["g_"+slug(me[0])];$("ttl").textContent="Playing "+me[0];var gd=$("gd");gd.textContent="";var dl=el("dl");
+function draw(){if(!me)return;var k=K[me[1]]||K.fighter,g=cfg["g_"+slug(me[0])];$("ttl").textContent="Playing "+me[0];var gd=$("gd");gd.textContent="";var dl=el("dl");
  if(g){$("note").textContent="Custom guide for "+me[0]+".";[["Early game",g.e],["Mid game",g.m],["Late game",g.l],["Runes",g.ru],["Starting item",g.st],["Core items",g.co],["Summoners",g.su]].forEach(function(p){dl.appendChild(el("dt",0,p[0]));dl.appendChild(el("dd",0,p[1]))})}
  else if(me[0]==="Rumble"){$("note").textContent="Champion-specific guide with your core principles.";P.forEach(function(p){dl.appendChild(el("dt",0,p[0]));dl.appendChild(el("dd",0,p[1]))})}
  else{$("note").textContent="Class guide ("+k[0]+"). It does not include "+me[0]+"'s own ability tips.";[["Early game",k[1]],["Mid game",k[2]],["Late game",k[3]],["Runes",k[4]],["Starting item",k[5]],["Core items",k[6]],["Summoners",k[7]]].forEach(function(p){dl.appendChild(el("dt",0,p[0]));dl.appendChild(el("dd",0,p[1]))})}
@@ -264,6 +264,7 @@ var SHIM={collection:function(){return{doc:function(id){return{
 (function(){
   var championData = {};
   var statVersion = "";
+  var loadingName = "";
   function safeName(s){return String(s||"").toLowerCase().replace(/[^a-z0-9]/g,"")}
   function htmlText(s){var d=document.createElement("div");d.innerHTML=String(s||"");return (d.textContent||d.innerText||"").replace(/\s+/g," ").trim()}
   function addSection(){
@@ -333,6 +334,8 @@ var SHIM={collection:function(){return{doc:function(id){return{
     if(!name)return;
     var d=Object.values(championData).find(function(x){return x.name===name});
     if(d){renderChampion(name);return}
+    if(loadingName===name)return;
+    loadingName=name;
     fetch("https://ddragon.leagueoflegends.com/api/versions.json").then(function(r){return r.json()}).then(function(v){
       statVersion=v[0];
       return fetch("https://ddragon.leagueoflegends.com/cdn/"+statVersion+"/data/en_US/champion.json");
@@ -346,15 +349,15 @@ var SHIM={collection:function(){return{doc:function(id){return{
     }).catch(function(){
       var root=document.getElementById("ability-content");
       if(root)root.textContent="Could not load Riot champion data right now. Try again shortly.";
-    });
+    }).then(function(){loadingName="";});
   }
   var style=document.createElement("style");
   style.textContent="#ability-reference{margin-top:28px}.ability-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;margin-top:12px}.ability-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}.ability-card h3,.gd h3{margin:0 0 8px;color:var(--ac);font-size:1.15rem}.ability-card p{margin:8px 0}.ability-tip{border-top:1px solid var(--line);padding-top:8px}.ability-meta{color:var(--mut);font-size:.88rem}.stats-link{display:inline-block;color:var(--ac);font-weight:600;margin:4px 0}.ability-card{min-width:0}";
   document.head.appendChild(style);
   var oldChoose=window.choose;
-  if(typeof oldChoose==="function")window.choose=function(c){oldChoose(c);setTimeout(function(){renderChampion(c[0])},0)};
+  if(typeof oldChoose==="function")window.choose=function(c){oldChoose(c);setTimeout(load,0)};
   var oldDraw=window.draw;
-  if(typeof oldDraw==="function")window.draw=function(){oldDraw();if(window.me)setTimeout(function(){renderChampion(window.me[0])},0)};
+  if(typeof oldDraw==="function")window.draw=function(){oldDraw();setTimeout(load,0)};
 })();
 </script>
 </body></html>
