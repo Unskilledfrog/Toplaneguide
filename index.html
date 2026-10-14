@@ -51,6 +51,16 @@ dt{color:var(--mut);font-size:.9rem}dd{margin:0}
 #cms-images figure{margin:0;max-width:220px}
 #cms-images img{display:block;width:100%;height:auto;max-height:180px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
 #cms-images figcaption{font-size:.85rem;color:var(--mut);margin-top:4px}
+
+/* Champion-specific ability, difficulty and stats panel */
+#champion-extras{margin-top:24px}
+.extra-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}
+.extra-card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:13px}
+.extra-card h3{margin:0 0 6px;font:700 1.2rem "Barlow Condensed",sans-serif;color:#f6e8c7}
+.extra-card p{margin:5px 0;color:var(--mut)}
+.extra-card .ability-name{color:var(--fg);font-weight:700}
+.extra-card a{color:var(--cool);overflow-wrap:anywhere}
+.extra-note{font-size:.88rem;color:var(--mut)}
 </style></head><body><div class="w">
 <h1 id="h1">Lane matchup guide</h1>
 <p class="sub" id="site-description">Ratings run from 1 (easiest matchup) to 10 (hardest). Pick your lane, then choose the champion you are playing. You get a guide for them, plus how to play them against every top laner, with runes and items.</p>
@@ -255,6 +265,99 @@ var SHIM={collection:function(){return{doc:function(id){return{
       }
     })
     .catch(function(){ /* Keep the existing site usable if CMS settings are unavailable. */ });
+})();
+</script>
+
+<script>
+/* Add Riot Data Dragon ability details and keep champion difficulty separate from matchup difficulty. */
+(function(){
+  var host, current='', cache=null, version=null, busy=false;
+  function node(tag,cls,txt){var n=document.createElement(tag);if(cls)n.className=cls;if(txt!==undefined)n.textContent=txt;return n}
+  function normalized(s){return String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'')}
+  function tip(spell,i){
+    var d=(spell.description||'').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim();
+    var name=spell.name||('Ability '+i);
+    var advice=[
+      'Use this to start or extend a trade when the opponent cannot immediately punish you. Track its cooldown before committing again.',
+      'Use this to control space or protect yourself while trading. Avoid spending it for minor poke if the enemy can engage while it is unavailable.',
+      'Look for this ability when the opponent has used their escape or key defensive spell. Save it when its utility is more valuable than a little extra damage.',
+      'Treat this as a major fight tool: check its range and effect before engaging, and coordinate it with your other abilities rather than casting automatically.'
+    ][i]||'Check the effect below, then use it when it creates a clear trade, wave-control or team-fight advantage.';
+    if(/dash|leap|blink|charge|rush|lunge/i.test(d)) advice='This is your mobility tool. Keep track of where it leaves you; use it to dodge or reach a target only when you have a safe follow-up.';
+    else if(/shield|heal|restore health|damage reduction|invulnerable/i.test(d)) advice='This is a defensive/sustain tool. Time it for the enemy’s burst or an extended trade instead of wasting it before the opponent commits.';
+    else if(/stun|root|knock.?up|slow|immobiliz|suppress/i.test(d)) advice='This provides crowd control. Save it to interrupt an important enemy action or guarantee follow-up damage, and respect its cooldown when it misses.';
+    else if(/mark|bonus damage|empowered|on-hit|attack speed/i.test(d)) advice='Look for the trigger or empowered window described below. Build your trade around that window and avoid fighting when the effect is unavailable.';
+    else if(/area|nearby enemies|cone|line|explod|zone/i.test(d)) advice='Position so the target cannot easily leave the effect area. Use the wave or terrain to make the hit more reliable.';
+    return {name:name,desc:d,tip:advice};
+  }
+  function dataDragon(){
+    if(cache)return Promise.resolve(cache);
+    if(busy)return new Promise(function(resolve){var t=setInterval(function(){if(cache){clearInterval(t);resolve(cache)}},100)});
+    busy=true;
+    return fetch('https://ddragon.leagueoflegends.com/api/versions.json').then(function(r){if(!r.ok)throw Error('Could not load Riot patch version');return r.json()})
+      .then(function(v){version=v[0];return fetch('https://ddragon.leagueoflegends.com/cdn/'+version+'/data/en_US/champion.json')})
+      .then(function(r){if(!r.ok)throw Error('Could not load champion data');return r.json()})
+      .then(function(j){cache={version:version,champions:j.data};busy=false;return cache})
+      .catch(function(e){busy=false;throw e});
+  }
+  function lookup(all,name){
+    var key=normalized(name), aliases={'wukong':'MonkeyKing','nunuwillump':'Nunu','renata glasc':'Renata','ksante':'KSante','fiddlesticks':'Fiddlesticks','reksai':'RekSai','chogath':'Chogath','kogmaw':'KogMaw','khazix':'Khazix','leesin':'LeeSin','masteryi':'MasterYi','missfortune':'MissFortune','twistedfate':'TwistedFate','jarvaniv':'JarvanIV','drmundo':'DrMundo','aurelionsol':'AurelionSol','belveth':'Belveth','velkoz':'Velkoz','xin zhao':'XinZhao','tahmkench':'TahmKench','twistedfate':'TwistedFate'};
+    var id=aliases[key]||Object.keys(all).find(function(k){return normalized(k)===key||normalized(all[k].name)===key});
+    return id?all[id]:null;
+  }
+  function render(name){
+    if(!host)return;
+    host.textContent='';
+    var heading=node('h2',null,'Ability tips, difficulty & matchup stats');
+    host.appendChild(heading);
+    var sub=node('p','extra-note','Ability descriptions and champion difficulty come from Riot Data Dragon. Matchup difficulty (1–10) is separate from champion difficulty.');
+    host.appendChild(sub);
+    var stats=node('div','extra-card');
+    stats.appendChild(node('h3',null,'Counters & win rate'));
+    stats.appendChild(node('p',null,'Current win rates and counter rankings change by patch, rank and region. Open the live matchup data rather than showing an invented or stale percentage.'));
+    var links=node('p');
+    [['U.GG — counters & win rate','https://u.gg/lol/champions/'+name.toLowerCase().replace(/[^a-z0-9]+/g,'-')+'/counter'],['Lolalytics — matchup stats','https://lolalytics.com/lol/'+name.toLowerCase().replace(/[^a-z0-9]+/g,'')+'/build/']].forEach(function(x){var a=node('a',null,x[0]);a.href=x[1];a.target='_blank';a.rel='noopener noreferrer';links.appendChild(a);links.appendChild(document.createTextNode(' · '))});
+    stats.appendChild(links);host.appendChild(stats);
+    dataDragon().then(function(dd){
+      if(current!==name)return;
+      var champ=lookup(dd.champions,name);
+      if(!champ){host.appendChild(node('p','extra-note','Could not match this champion to Riot Data Dragon.'));return}
+      var info=champ.info||{},rating=node('div','extra-card');
+      rating.appendChild(node('h3',null,'Champion difficulty: '+(info.difficulty||'—')+'/10 (Riot)'));
+      rating.appendChild(node('p',null,'Riot’s champion-complexity rating. This is not the matchup difficulty rating shown against an opponent.'));
+      host.insertBefore(rating,stats);
+      var grid=node('div','extra-grid');
+      var passive=champ.passive||{};
+      var pc=node('div','extra-card');pc.appendChild(node('h3',null,'Passive — '+(passive.name||'Passive')));pc.appendChild(node('p',null,(passive.description||'').replace(/<[^>]*>/g,' ')));pc.appendChild(node('p','extra-note','Tip: Learn what activates this passive and plan trades around its empowered window.'));grid.appendChild(pc);
+      (champ.spells||[]).forEach(function(s,i){var t=tip(s,i),card=node('div','extra-card');card.appendChild(node('h3',null,(['Q','W','E','R'][i]||'Ability')+' — '+t.name));card.appendChild(node('p',null,t.desc||'See the in-game tooltip for full details.'));card.appendChild(node('p',null,'How to use it: '+t.tip));if(s.cooldown&&s.cooldown.length)card.appendChild(node('p','extra-note','Base cooldown by rank: '+s.cooldown.join(' / ')+' seconds.'));grid.appendChild(card)});
+      host.appendChild(node('h3',null,'Ability-by-ability guide'));
+      host.appendChild(grid);
+      var principles=node('div','extra-card');principles.style.marginTop='10px';
+      principles.appendChild(node('h3',null,name+' — core principles'));
+      var core=info.attack>info.defense?'Look for controlled trades and keep enough resources to punish the enemy after their key cooldowns are spent.':'Prioritize safe wave control, track enemy engage tools, and commit when your main defensive or crowd-control ability is available.';
+      principles.appendChild(node('p',null,core+' Check the ability tips above for the champion’s specific effects. Use your ultimate as a fight-shaping tool, not automatically on cooldown.'));
+      host.appendChild(principles);
+    }).catch(function(){host.appendChild(node('p','extra-note','Riot ability data could not load. Check your connection and reload the page.'))});
+  }
+  function update(){
+    var title=document.getElementById('ttl');
+    if(!title)return;
+    var name=(title.textContent||'').replace(/^Playing\s+/,'').trim();
+    var out=document.getElementById('out');
+    if(!name||!out||out.classList.contains('hide'))return;
+    if(name===current)return;
+    current=name;render(name);
+  }
+  function init(){
+    var out=document.getElementById('out'),gd=document.getElementById('gd');
+    if(!out||!gd)return;
+    host=node('section');host.id='champion-extras';out.appendChild(host);
+    var title=document.getElementById('ttl');
+    if(title)new MutationObserver(update).observe(title,{childList:true,subtree:true,characterData:true});
+    new MutationObserver(update).observe(out,{attributes:true,attributeFilter:['class']});
+    update();
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script>
 </body></html>
