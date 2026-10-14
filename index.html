@@ -121,8 +121,7 @@ function sc(x,y){var v=EO[x[1]+">"+y[1]]||0,w=[];
  if(T.GC.indexOf(x[0])>=0&&(y[1]==="ranged"||y[1]==="mage")){v+=2;w.push(x[0]+" can jump onto "+y[0])}
  return[v,w]}
 function mu0(c,e){
- if(c[0]==="Rumble"&&R[e[0]]){var r=R[e[0]];return{r:RS[e[0]],p:r[1],ru:r[2],s:r[3],b:r[4],su:r[5],w:""}}
- var k=K[c[1]],a=sc(e,c),b=sc(c,e),d=Math.max(1,Math.min(10,5+a[0]-b[0])),w=[];
+  var k=K[c[1]],a=sc(e,c),b=sc(c,e),d=Math.max(1,Math.min(10,5+a[0]-b[0])),w=[];
  if(c[0]===e[0])d=5;
  if(a[1].length)w.push("Against you: "+a[1].join("; ")+".");if(b[1].length)w.push("For you: "+b[1].join("; ")+".");
  return{r:d,p:XP(c,e),ru:k[4],s:d>=7&&LN==="top"?"Doran's Shield + Health Potion":k[5],b:e[2]?BM:BA,su:k[7],w:w.join(" ")}}
