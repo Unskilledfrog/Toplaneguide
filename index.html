@@ -276,6 +276,26 @@ var SHIM={collection:function(){return{doc:function(id){return{
     section.innerHTML='<h2>Ability guide</h2><p class="sub">Ability descriptions and champion difficulty are loaded from Riot Games Data Dragon. Tips explain practical use, but check current in-game tooltips for exact numbers.</p><div id="ability-content" class="ability-grid"><p class="sub">Loading champion abilities…</p></div><div id="champion-stats" class="gd"></div>';
     anchor.parentNode.insertBefore(section,anchor.nextSibling);
   }
+  function tailoredTip(champion,label,spell){
+    var text=htmlText((spell&&spell.description||"")+" "+(spell&&spell.tooltip||"")).toLowerCase();
+    if(/dash|blink|leap|teleport|rush|charge/.test(text))return "Mobility tool: use it to dodge an important enemy ability or reposition for a trade. If it is your only escape, avoid spending it aggressively while the enemy jungler could be nearby.";
+    if(/stun|root|knock.?up|suppress|snare|immobiliz/.test(text))return "Crowd-control tool: try to land it when the opponent has used their dodge or movement ability. It is especially valuable when your jungler can follow up; avoid throwing it away for low-value poke.";
+    if(/shield|damage reduction|block damage|invulnerab/.test(text))return "Defensive tool: time it for the enemy's main burst or crowd-control window, rather than activating it after most of the damage has already landed.";
+    if(/heal|healing|restore.*health|life steal|omnivamp/.test(text))return "Sustain tool: get value from it during a real trade or after taking meaningful damage. Check whether it needs you to hit a champion, minion or monster to trigger its full effect.";
+    if(/invisible|stealth|camouflage|untargetable/.test(text))return "Use the concealment or untargetability to break enemy targeting, dodge a key spell or change your approach. Keep track of detection and area effects that can still reveal or hit you.";
+    if(/execute|missing health|below.*health|kill.*threshold/.test(text))return "Finisher: save it until the target is in its effective kill range, unless using it earlier guarantees a key setup. Watch the target's health and defensive cooldowns before committing.";
+    if(/mark|marked|detonate|consume/.test(text))return "Setup and payoff: apply the mark or effect first, then follow with the ability or attack that triggers its bonus. Avoid breaking the sequence by using the payoff too early.";
+    if(/slow|slows|movement speed/.test(text))return "Kiting and chase tool: use the slow to keep the opponent in range or to create space while retreating. It is strongest when paired with your follow-up damage, not when the enemy is already safely out of reach.";
+    if(/projectile|missile|skill.?shot|line of|fires a/.test(text))return "Aim for the opponent's movement path rather than their current position. Try to cast after they spend a dash or while they are last-hitting, and account for minions if the ability can be blocked.";
+    if(/trap|brush|terrain|wall|zone|area/.test(text))return "Area-control tool: place or use it where the enemy wants to walk—around minions, choke points or objectives. Think about how it changes their available path, not only its direct damage.";
+    if(/summon|pet|turret|soldier|clone|spirit/.test(text))return "Summon or deploy it where it can keep affecting the fight while you stay safe. Check its duration and positioning, and avoid wasting it just before an objective or a likely all-in.";
+    if(label==="R")return "Ultimate: use it around its strongest condition—such as a crowd-control setup, a vulnerable target, or a team fight. Track the cooldown after using it and tell your team when it is available again.";
+    if(label==="Passive")return "Passive: learn the trigger and the reward. Build your trades around activating it reliably, and check whether it resets, stacks or has an internal cooldown.";
+    if(label==="Q")return "Usually your most frequently used basic ability: learn its range and cooldown, then use it to secure farm or start a trade when the opponent cannot punish you.";
+    if(label==="W")return "Before using this, identify whether it is your damage, defense or setup tool. Keeping it available can discourage the enemy from engaging even when you never cast it.";
+    if(label==="E")return "Treat this as a key part of your trading pattern. If it provides mobility or an escape, think twice before spending it when the enemy jungler is missing.";
+    return "Check the ability's range, cast time and cooldown in practice tool. Try it in a short trade first, then commit when you know the enemy cannot immediately punish the cooldown.";
+  }
   function renderChampion(name){
     addSection();
     var root=document.getElementById("ability-content"),stats=document.getElementById("champion-stats");
@@ -298,7 +318,7 @@ var SHIM={collection:function(){return{doc:function(id){return{
       var card=document.createElement("article");card.className="ability-card";
       var heading=document.createElement("h3");heading.textContent=item.label+" — "+(item.spell.name||"");card.appendChild(heading);
       var desc=document.createElement("p");desc.textContent=htmlText(item.spell.description||item.spell.tooltip||"Description unavailable.");card.appendChild(desc);
-      var tip=document.createElement("p");tip.className="ability-tip";tip.textContent="How to use it: "+item.tip;card.appendChild(tip);
+      var tip=document.createElement("p");tip.className="ability-tip";tip.textContent="How to use it: "+tailoredTip(name,item.label,item.spell);card.appendChild(tip);
       if(item.spell.cooldown&&item.spell.cooldown.length){var cd=document.createElement("p");cd.className="ability-meta";cd.textContent="Base cooldown by rank: "+item.spell.cooldown.join(" / ")+" sec";card.appendChild(cd)}
       root.appendChild(card);
     });
