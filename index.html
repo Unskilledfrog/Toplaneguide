@@ -51,6 +51,19 @@ dt{color:var(--mut);font-size:.9rem}dd{margin:0}
 #cms-images figure{margin:0;max-width:220px}
 #cms-images img{display:block;width:100%;height:auto;max-height:180px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
 #cms-images figcaption{font-size:.85rem;color:var(--mut);margin-top:4px}
+
+/* Champion-specific ability, difficulty and stats panel */
+#champion-extras{margin-top:24px}
+.extra-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}
+.extra-card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:13px}
+.extra-card h3{margin:0 0 6px;font:700 1.2rem "Barlow Condensed",sans-serif;color:#f6e8c7}
+.extra-card p{margin:5px 0;color:var(--mut)}
+.extra-card .ability-name{color:var(--fg);font-weight:700}
+.extra-card a{color:var(--cool);overflow-wrap:anywhere}
+.extra-note{font-size:.88rem;color:var(--mut)}
+
+/* Working champion guide panels */
+.champ-extra{margin-top:14px}.extra-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}.extra-card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;margin:8px 0}.extra-card h3{font:700 1.2rem "Barlow Condensed",sans-serif;margin:0 0 6px;color:#f6e8c7}.extra-card p{margin:5px 0}.extra-muted{color:var(--mut);font-size:.9rem}.extra-card a{color:var(--cool);overflow-wrap:anywhere}.spell-cooldowns{margin:10px 12px 12px}
 </style></head><body><div class="w">
 <h1 id="h1">Lane matchup guide</h1>
 <p class="sub" id="site-description">Ratings run from 1 (easiest matchup) to 10 (hardest). Pick your lane, then choose the champion you are playing. You get a guide for them, plus how to play them against every top laner, with runes and items.</p>
@@ -157,11 +170,82 @@ function editGuide(){var g=cfg["g_"+slug(me[0])],k=K[me[1]];form("Guide for "+me
 var TF=[["name","Champion name","x",1],["cls","Class","s",["tank","fighter","ranged","mage","assassin"]],["ap","Deals mostly magic damage","b"],["tk","Tank killer strength (0 to 5)","n",[0,5]],["eb","Strong early game","b"],["sc","Weak early game, scales later","b"],["pk","Pokes from range","b"],["ng","Melee with no gap closer","b"],["gc","Can jump onto squishy targets","b"],["hide","Hide this champion","b"]];
 function editTraits(c){form(c[0]+" traits",TF,traits(c),"c_"+slug(c[0]),"Reset to default")}
 function addChamp(){var t=traits(["",  "fighter",0]);form("Add champion",[["name","Champion name","x"]].concat(TF.slice(1)),t,function(d){return"c_"+slug(d.name)})}
+
+/* Full Riot champion files are required: the summary champion.json has no spell definitions. */
+var DD={version:null,index:null,cache:{}};
+function ddIndex(){if(DD.index)return Promise.resolve(DD.index);return fetch("https://ddragon.leagueoflegends.com/api/versions.json").then(function(r){if(!r.ok)throw Error("Riot patch list unavailable");return r.json()}).then(function(v){DD.version=v[0];return fetch("https://ddragon.leagueoflegends.com/cdn/"+DD.version+"/data/en_US/champion.json")}).then(function(r){if(!r.ok)throw Error("Riot champion index unavailable");return r.json()}).then(function(j){DD.index=j.data;return DD.index})}
+function ddId(name,index){var n=String(name||"").toLowerCase().replace(/[^a-z0-9]/g,"");var aliases={wukong:"MonkeyKing",monkeyking:"MonkeyKing",nunuwillump:"Nunu",ksante:"KSante",reksai:"RekSai",chogath:"Chogath",kogmaw:"KogMaw",khazix:"Khazix",leesin:"LeeSin",masteryi:"MasterYi",missfortune:"MissFortune",twistedfate:"TwistedFate",jarvaniv:"JarvanIV",drmundo:"DrMundo",aurelionsol:"AurelionSol",belveth:"Belveth",velkoz:"VelKoz",xinzhao:"XinZhao",tahmkench:"TahmKench"};var id=aliases[n];if(id&&index[id])return id;var keys=Object.keys(index);for(var i=0;i<keys.length;i++){if(keys[i].toLowerCase().replace(/[^a-z0-9]/g,"")===n||String(index[keys[i]].name).toLowerCase().replace(/[^a-z0-9]/g,"")===n)return keys[i]}return null}
+function ddChamp(name){return ddIndex().then(function(index){var id=ddId(name,index);if(!id)throw Error("Champion not found: "+name);if(DD.cache[id])return DD.cache[id];return fetch("https://ddragon.leagueoflegends.com/cdn/"+DD.version+"/data/en_US/champion/"+id+".json").then(function(r){if(!r.ok)throw Error("Champion detail unavailable");return r.json()}).then(function(j){DD.cache[id]=j.data[id];return DD.cache[id]})})}
+function cleanTip(s){return String(s||"").replace(/<br\s*\/?\s*>/gi," ").replace(/<[^>]*>/g," ").replace(/\{\{[^}]+\}\}/g,"[in-game value]").replace(/\s+/g," ").trim()}
+function extraEl(tag,cls,txt){var n=document.createElement(tag);if(cls)n.className=cls;if(txt!==undefined)n.textContent=txt;return n}
+function addExtraLink(parent,label,url){var a=extraEl("a",null,label);a.href=url;a.target="_blank";a.rel="noopener noreferrer";parent.appendChild(a)}
+function championSlug(name){return String(name||"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")}
+function abilityAdvice(spell,index,champ){var text=(String(spell.name||"")+" "+String(spell.description||"")+" "+String(spell.tooltip||"")).toLowerCase();if(/dash|leap|blink|charge|lunge|rush|jump|mobility/.test(text))return "Mobility: save this to dodge key enemy crowd control or follow up after the opponent spends an escape. Do not dash forward if it leaves you with no safe exit.";if(/shield|heal|restore health|damage reduction|invulnerable|untargetable/.test(text))return "Defense or sustain: time it for the enemy’s damage window, not before they commit. Track its cooldown before taking another extended trade.";if(/stun|root|knock.?up|slow|immobiliz|suppress|silence|fear|taunt/.test(text))return "Crowd control: use it to interrupt a key enemy action or set up guaranteed follow-up. If it misses, respect the window before it comes back.";if(/mark|empowered|bonus damage|on-hit|attack speed|next attack|next basic attack/.test(text))return "Empowered damage: look for the exact trigger in the description and trade while the effect is active. Avoid forcing a fight after the empowered window expires.";if(/area|nearby enemies|cone|line|explod|zone|ground/.test(text))return "Area effect: position so the enemy has fewer easy escape routes; use minions, terrain or crowd control to make the hit reliable.";if(/projectile|missile|skillshot|launch|throw|fires? a/.test(text))return "Skillshot: watch the enemy’s movement and escape cooldown, then aim where they must move rather than where they are. A missed cast is a window for the opponent.";if(index===3)return "Ultimate: treat this as a major fight or all-in cooldown. Check range and crowd-control setup, and avoid spending it when your team cannot follow up.";return "Read the effect and identify its job in your combo. Use it when it creates a real trade or wave-control advantage, and track the cooldown before re-engaging."}
+function renderChampionExtras(name,container){
+ var root=extraEl("section","champ-extra");root.id="champion-extra";container.appendChild(root);
+ root.appendChild(extraEl("h3",null,"Champion abilities, difficulty & counters"));
+ var loading=extraEl("p","extra-muted","Loading this champion’s official ability data…");root.appendChild(loading);
+ var stats=extraEl("div","extra-card");stats.appendChild(extraEl("h3",null,"Live counters and win rate"));
+ stats.appendChild(extraEl("p",null,"Win rate and counter rankings depend on patch, rank, region and role. Use live matchup pages rather than an unverified hard-coded percentage."));
+ addExtraLink(stats,"U.GG counter picks & win rate","https://u.gg/lol/champions/"+championSlug(name)+"/counter");
+ stats.appendChild(document.createTextNode(" · "));
+ addExtraLink(stats,"Lolalytics matchup statistics","https://lolalytics.com/lol/"+championSlug(name).replace(/-/g,"")+"/build/");
+ root.appendChild(stats);
+ ddChamp(name).then(function(ch){
+  if(!root.isConnected)return;loading.remove();
+  var inf=ch.info||{},diff=extraEl("div","extra-card");
+  diff.appendChild(extraEl("h3",null,"Riot champion difficulty: "+(inf.difficulty||"—")+"/10"));
+  diff.appendChild(extraEl("p","extra-muted","This is champion complexity, not the 1–10 matchup difficulty rating."));
+  root.insertBefore(diff,stats);
+  var grid=extraEl("div","extra-grid"),pass=ch.passive||{},pc=extraEl("article","extra-card");
+  pc.appendChild(extraEl("h3",null,"Passive — "+(pass.name||"Passive")));
+  pc.appendChild(extraEl("p",null,cleanTip(pass.description)||"See the in-game tooltip."));
+  pc.appendChild(extraEl("p","extra-muted","Tip: Identify what triggers this passive and plan your trade around its available window."));grid.appendChild(pc);
+  (ch.spells||[]).forEach(function(sp,i){
+   var card=extraEl("article","extra-card"),key=["Q","W","E","R"][i]||"Ability";
+   card.appendChild(extraEl("h3",null,key+" — "+sp.name));
+   card.appendChild(extraEl("p",null,cleanTip(sp.description)||cleanTip(sp.tooltip)||"See the in-game tooltip for full details."));
+   var tip=(ch.allytips||[])[i]||"Use this ability when it creates a clear trade, wave-control or fight advantage; track its cooldown before committing again.";
+   card.appendChild(extraEl("p",null,"How to use it: "+cleanTip(tip)));
+   if(sp.cooldown&&sp.cooldown.length)card.appendChild(extraEl("p","extra-muted","Base cooldown by rank: "+sp.cooldown.join(" / ")+" sec. Actual cooldown changes with ability haste."));
+   grid.appendChild(card);
+  });
+  root.appendChild(extraEl("h3",null,"Ability-by-ability tips"));root.appendChild(grid);
+  var core=extraEl("div","extra-card");core.appendChild(extraEl("h3",null,name+" — champion-specific core principles"));
+  var tips=ch.allytips||[], spells=ch.spells||[], all=spells.map(function(sp,i){return {sp:sp,i:i,text:(sp.name+" "+sp.description+" "+sp.tooltip).toLowerCase()}}), find=function(re){return all.find(function(x){return re.test(x.text)})};
+  var engage=find(/dash|leap|blink|charge|lunge|rush|jump|engage/), cc=find(/stun|root|knock.?up|immobiliz|suppress|fear|taunt|charm|snare/), defense=find(/shield|heal|restore health|damage reduction|invulnerable|untargetable/), poke=find(/projectile|missile|skillshot|range|slow|throw|fires? a/), reset=find(/reset|refresh|cooldown is reduced|recall/), ult=all[3];
+  core.appendChild(extraEl("p",null,(tips[0]?cleanTip(tips[0])+" ":"")+"Game plan: build trades around "+(cc?"landing "+["Q","W","E","R"][cc.i]+" ("+cc.sp.name+")":engage?"using "+["Q","W","E","R"][engage.i]+" ("+engage.sp.name+")":"your highest-impact ability")+" rather than spending every spell at once. Check the wave and enemy jungler before committing."));
+  if(engage)core.appendChild(extraEl("p",null,"Commit or escape — "+["Q","W","E","R"][engage.i]+" · "+engage.sp.name+":** "+cleanTip(engage.sp.description||engage.sp.tooltip)+". Keep this available when the enemy can punish your forward movement."));
+  if(cc)core.appendChild(extraEl("p",null,"Trade setup — "+["Q","W","E","R"][cc.i]+" · "+cc.sp.name+":** use its crowd control to make your follow-up reliable; if it misses, shorten the trade and wait for the next window."));
+  if(defense)core.appendChild(extraEl("p",null,"Survival window — "+["Q","W","E","R"][defense.i]+" · "+defense.sp.name+":** hold this for the enemy’s burst or all-in where possible, instead of using it for trivial poke."));
+  if(poke)core.appendChild(extraEl("p",null,"Range and spacing — "+["Q","W","E","R"][poke.i]+" · "+poke.sp.name+":** pressure from the range this spell gives you, and watch whether minions or terrain block its path."));
+  if(reset)core.appendChild(extraEl("p",null,"Combo window — "+["Q","W","E","R"][reset.i]+" · "+reset.sp.name+":** look for the reset/refresh condition and plan the next cast before starting the combo."));
+  if(ult)core.appendChild(extraEl("p",null,"Level 6 and teamfights — R · "+ult.sp.name+":** "+cleanTip(ult.sp.description||ult.sp.tooltip)+". Track the opponent’s key cooldowns before using this as your all-in signal."));
+  if(tips[1])core.appendChild(extraEl("p",null,"Riot champion tip: "+cleanTip(tips[1])));
+  core.appendChild(extraEl("p","extra-muted","These principles are assembled from this champion’s own ability descriptions and Riot tips; cooldowns shown are base values and change with ability haste."));root.appendChild(core);
+ }).catch(function(){if(root.isConnected)loading.textContent="Could not load Riot’s champion file. Check your connection and reload; ability data is not being guessed."});
+}
+function renderCooldownExplainer(detail,ownName,enemyName){
+ if(detail.querySelector(".spell-cooldowns"))return;
+ var box=extraEl("div","extra-card spell-cooldowns");box.appendChild(extraEl("h3",null,"Key cooldowns: "+ownName+" vs "+enemyName));
+ box.appendChild(extraEl("p",null,"A cooldown is the time after casting an ability before you can cast it again. Look for a trade when your important spell is ready and the opponent has just used theirs; avoid committing if your escape or defense is unavailable."));
+ var grid=extraEl("div","extra-grid");box.appendChild(grid);detail.appendChild(box);
+ Promise.all([ddChamp(ownName),ddChamp(enemyName)]).then(function(champs){
+  if(!box.isConnected)return;
+  [[ownName,champs[0],"Your champion"],[enemyName,champs[1],"Opponent"]].forEach(function(item){
+   var card=extraEl("div","extra-card");card.appendChild(extraEl("h3",null,item[2]+": "+item[0]));
+   var spells=item[1].spells||[], ranked=spells.map(function(sp,i){var t=(sp.name+" "+sp.description+" "+sp.tooltip).toLowerCase(),score=(i===3?2:0)+(/stun|root|knock.?up|suppress|fear|taunt|charm|immobiliz/.test(t)?5:0)+(/dash|leap|blink|untargetable|invulnerable|shield|heal/.test(t)?3:0)+(/execute|reset|mark|detonate|empowered|true damage/.test(t)?2:0);return {sp:sp,i:i,score:score}}).sort(function(a,b){return b.score-a.score});
+   if(ranked.length){var key=ranked[0],letter=["Q","W","E","R"][key.i];card.appendChild(extraEl("p",null,"KEY ABILITY TO WATCH: "+letter+" — "+key.sp.name+". "+cleanTip(key.sp.description||key.sp.tooltip)+". Watch for its animation/cast, then punish the cooldown if it misses or is used on the wave."));}
+   spells.forEach(function(sp,i){card.appendChild(extraEl("p",null,["Q","W","E","R"][i]+" — "+sp.name+": "+(sp.cooldown||[]).join(" / ")+" sec base cooldown."))});
+   grid.appendChild(card);
+  });
+ }).catch(function(){grid.appendChild(extraEl("p","extra-muted","Could not load spell cooldowns for this matchup."))});
+}
 function draw(){if(!me)return;var k=K[me[1]],g=cfg["g_"+slug(me[0])];$("ttl").textContent="Playing "+me[0];var gd=$("gd");gd.textContent="";var dl=el("dl");
  if(g){$("note").textContent="Custom guide for "+me[0]+".";[["Early game",g.e],["Mid game",g.m],["Late game",g.l],["Runes",g.ru],["Starting item",g.st],["Core items",g.co],["Summoners",g.su]].forEach(function(p){dl.appendChild(el("dt",0,p[0]));dl.appendChild(el("dd",0,p[1]))})}
  else if(me[0]==="Rumble"){$("note").textContent="Champion-specific guide with your core principles.";P.forEach(function(p){dl.appendChild(el("dt",0,p[0]));dl.appendChild(el("dd",0,p[1]))})}
- else{$("note").textContent="Class guide ("+k[0]+"). It does not include "+me[0]+"'s own ability tips.";[["Early game",k[1]],["Mid game",k[2]],["Late game",k[3]],["Runes",k[4]],["Starting item",k[5]],["Core items",k[6]],["Summoners",k[7]]].forEach(function(p){dl.appendChild(el("dt",0,p[0]));dl.appendChild(el("dd",0,p[1]))})}
- gd.appendChild(dl);if(IS&&db){var b1=el("button","back eb","Edit guide"),b2=el("button","back eb","Edit traits");b1.onclick=editGuide;b2.onclick=function(){editTraits(me)};gd.appendChild(b1);gd.appendChild(b2)}render()}
+ else{$("note").textContent="Class guide ("+k[0]+"). Champion-specific abilities and core principles are shown below.";[["Early game",k[1]],["Mid game",k[2]],["Late game",k[3]],["Runes",k[4]],["Starting item",k[5]],["Core items",k[6]],["Summoners",k[7]]].forEach(function(p){dl.appendChild(el("dt",0,p[0]));dl.appendChild(el("dd",0,p[1]))})}
+ gd.appendChild(dl);renderChampionExtras(me[0],gd);if(IS&&db){var b1=el("button","back eb","Edit guide"),b2=el("button","back eb","Edit traits");b1.onclick=editGuide;b2.onclick=function(){editTraits(me)};gd.appendChild(b1);gd.appendChild(b2)}render()}
 function choose(c){me=c;$("pick").classList.add("hide");$("out").classList.remove("hide");$("q").value="";$("f").value="";$("so").value="az";draw();window.scrollTo(0,0)}
 function refresh(){if(me){me=C.filter(function(c){return c[0]===me[0]})[0]||null;if(!me){$("out").classList.add("hide");$("pick").classList.remove("hide")}else draw()}buildGrid()}
 var rows=[["Why this rating","w"],["Plan","p"],["Runes","ru"],["Starting item","s"],["First back","b"],["Summoners","su"]];
@@ -169,7 +253,7 @@ function render(){var q=$("q").value.trim().toLowerCase(),f=$("f").value,so=$("s
  C.forEach(function(e){if(q&&e[0].toLowerCase().indexOf(q)<0)return;var m=mu(me,e);if(f&&band(m.r)!==f)return;a.push([e,m])});
  if(so==="hard")a.sort(function(x,y){return y[1].r-x[1].r});if(so==="easy")a.sort(function(x,y){return x[1].r-y[1].r});
  a.forEach(function(t){var e=t[0],m=t[1],d=el("details",band(m.r)),s=el("summary");s.appendChild(el("b",0,"vs "+e[0]));s.appendChild(el("span","ty",K[e[1]][0]));s.appendChild(el("span","rt","Difficulty "+m.r+"/10"));d.appendChild(s);
-  var dl=el("dl");rows.forEach(function(r){if(!m[r[1]])return;dl.appendChild(el("dt",0,r[0]));dl.appendChild(el("dd",0,m[r[1]]))});d.appendChild(dl);if(IS&&db){var eb=el("button","back eb","Edit this matchup");eb.onclick=function(){editMatchup(e)};d.appendChild(eb)}L.appendChild(d)});
+  var dl=el("dl");rows.forEach(function(r){if(!m[r[1]])return;dl.appendChild(el("dt",0,r[0]));dl.appendChild(el("dd",0,m[r[1]]))});d.appendChild(dl);var live=el("p","extra-card"),liveTitle=el("b",0,"Live counters & win rate: ");live.appendChild(liveTitle);var liveLink=el("a",0,"View "+e[0]+" matchup stats");liveLink.href="https://u.gg/lol/champions/"+championSlug(e[0])+"/counter";liveLink.target="_blank";liveLink.rel="noopener noreferrer";live.appendChild(liveLink);d.appendChild(live);if(IS&&db){var eb=el("button","back eb","Edit this matchup");eb.onclick=function(){editMatchup(e)};d.appendChild(eb)}L.appendChild(d);d.addEventListener("toggle",function(){if(d.open)renderCooldownExplainer(d,me[0],e[0])})});
  $("cnt").textContent="("+a.length+")";if(!a.length)L.appendChild(el("p","sub","No champion matches. Clear the search or reset the filter."))}
 $("pq").addEventListener("input",buildGrid);$("q").addEventListener("input",render);$("f").addEventListener("change",render);$("so").addEventListener("change",render);
 $("bk").onclick=function(){me=null;$("out").classList.add("hide");$("pick").classList.remove("hide");window.scrollTo(0,0)};C0=JSON.stringify(C);T0=JSON.stringify(T);buildLanes();
@@ -257,6 +341,6 @@ var SHIM={collection:function(){return{doc:function(id){return{
     .catch(function(){ /* Keep the existing site usable if CMS settings are unavailable. */ });
 })();
 </script>
-<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-<script>if(window.location.hash.includes("recovery_token=")){window.location.replace("/admin/"+window.location.hash);}</script>
+
+
 </body></html>
