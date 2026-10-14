@@ -169,7 +169,7 @@ function render(){var q=$("q").value.trim().toLowerCase(),f=$("f").value,so=$("s
  C.forEach(function(e){if(q&&e[0].toLowerCase().indexOf(q)<0)return;var m=mu(me,e);if(f&&band(m.r)!==f)return;a.push([e,m])});
  if(so==="hard")a.sort(function(x,y){return y[1].r-x[1].r});if(so==="easy")a.sort(function(x,y){return x[1].r-y[1].r});
  a.forEach(function(t){var e=t[0],m=t[1],d=el("details",band(m.r)),s=el("summary");s.appendChild(el("b",0,"vs "+e[0]));s.appendChild(el("span","ty",K[e[1]][0]));s.appendChild(el("span","rt","Difficulty "+m.r+"/10"));d.appendChild(s);
-  var dl=el("dl");rows.forEach(function(r){if(!m[r[1]])return;dl.appendChild(el("dt",0,r[0]));dl.appendChild(el("dd",0,m[r[1]]))});d.appendChild(dl);if(IS&&db){var eb=el("button","back eb","Edit this matchup");eb.onclick=function(){editMatchup(e)};d.appendChild(eb)}L.appendChild(d)});
+  var dl=el("dl");rows.forEach(function(r){if(!m[r[1]])return;dl.appendChild(el("dt",0,r[0]));dl.appendChild(el("dd",0,m[r[1]]))});d.appendChild(dl);var statsLink=el("a","stats-link","View live matchup stats / counters ↗");statsLink.href="https://u.gg/lol/champions/"+encodeURIComponent(e[0].toLowerCase().replace(/\\s+/g,"-"))+"/counter";statsLink.target="_blank";statsLink.rel="noopener noreferrer";statsLink.style.display="inline-block";statsLink.style.margin="0 12px 12px";d.appendChild(statsLink);if(IS&&db){var eb=el("button","back eb","Edit this matchup");eb.onclick=function(){editMatchup(e)};d.appendChild(eb)}L.appendChild(d)});
  $("cnt").textContent="("+a.length+")";if(!a.length)L.appendChild(el("p","sub","No champion matches. Clear the search or reset the filter."))}
 $("pq").addEventListener("input",buildGrid);$("q").addEventListener("input",render);$("f").addEventListener("change",render);$("so").addEventListener("change",render);
 $("bk").onclick=function(){me=null;$("out").classList.add("hide");$("pick").classList.remove("hide");window.scrollTo(0,0)};C0=JSON.stringify(C);T0=JSON.stringify(T);buildLanes();
@@ -306,7 +306,7 @@ var SHIM={collection:function(){return{doc:function(id){return{
     stats.textContent="";
     var title=document.createElement("h3");title.textContent="Champion difficulty";stats.appendChild(title);
     var p=document.createElement("p");p.textContent=diff===null?"Riot difficulty rating unavailable.":"Riot Data Dragon difficulty: "+diff+"/10 (champion learning complexity; not matchup difficulty).";stats.appendChild(p);
-    var link=document.createElement("a");link.href="https://u.gg/lol/champions/"+encodeURIComponent(name.toLowerCase().replace(/\s+/g,"-"))+"/build";link.target="_blank";link.rel="noopener noreferrer";link.textContent="Open current win rate, matchups and counters on U.GG ↗";link.className="stats-link";stats.appendChild(link);
+    var link=document.createElement("a");link.href="https://u.gg/lol/champions/"+encodeURIComponent(name.toLowerCase().replace(/\s+/g,"-"))+"/counter";link.target="_blank";link.rel="noopener noreferrer";link.textContent="Live counters and matchup win rates on U.GG ↗";link.className="stats-link";stats.appendChild(link);
   }
   function load(){
     var current=Array.isArray(window.C)?window.C.find(function(c){return c&&c[0]===window.me?.[0]}):null;
