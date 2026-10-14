@@ -259,4 +259,83 @@ var SHIM={collection:function(){return{doc:function(id){return{
 </script>
 <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 <script>if(window.location.hash.includes("recovery_token=")){window.location.replace("/admin/"+window.location.hash);}</script>
+
+<script>
+/* Champion ability reference and Riot's official difficulty metadata. */
+(function(){
+  var championData = {};
+  var statVersion = "";
+  function safeName(s){return String(s||"").toLowerCase().replace(/[^a-z0-9]/g,"")}
+  function htmlText(s){var d=document.createElement("div");d.innerHTML=String(s||"");return (d.textContent||d.innerText||"").replace(/\s+/g," ").trim()}
+  function addSection(){
+    if(!document.getElementById("out") || document.getElementById("ability-reference")) return;
+    var anchor=document.getElementById("gd");
+    if(!anchor)return;
+    var section=document.createElement("section");
+    section.id="ability-reference";
+    section.innerHTML='<h2>Ability guide</h2><p class="sub">Ability descriptions and champion difficulty are loaded from Riot Games Data Dragon. Tips explain practical use, but check current in-game tooltips for exact numbers.</p><div id="ability-content" class="ability-grid"><p class="sub">Loading champion abilities…</p></div><div id="champion-stats" class="gd"></div>';
+    anchor.parentNode.insertBefore(section,anchor.nextSibling);
+  }
+  function renderChampion(name){
+    addSection();
+    var root=document.getElementById("ability-content"),stats=document.getElementById("champion-stats");
+    if(!root||!stats)return;
+    var key=safeName(name),data=championData[key];
+    if(!data){root.textContent="No Riot ability data found for "+name+".";return}
+    root.textContent="";
+    var spells=[{label:"Passive",spell:data.passive,tip:"Look for the condition that activates this effect. Plan trades around when it is ready, and avoid wasting its value on low-impact targets."}];
+    (data.spells||[]).forEach(function(sp,i){
+      var tips=[
+        "Use this as your main trade or poke tool when the opponent cannot easily punish you. Track its cooldown before committing again.",
+        "Check whether this ability provides damage, crowd control, a shield, healing or mobility. Save it for the effect that matters most in the matchup.",
+        "Treat this as a defensive or setup tool if it gives you an escape, crowd control or protection. Avoid spending it just for small poke when danger is nearby.",
+        "Use your ultimate around its strongest condition—such as a crowd-control setup, low-health target, team fight or objective. Communicate the cooldown after using it."
+      ];
+      spells.push({label:["Q","W","E","R"][i]||("Ability "+(i+1)),spell:sp,tip:tips[i]||tips[1]});
+    });
+    spells.forEach(function(item){
+      if(!item.spell)return;
+      var card=document.createElement("article");card.className="ability-card";
+      var heading=document.createElement("h3");heading.textContent=item.label+" — "+(item.spell.name||"");card.appendChild(heading);
+      var desc=document.createElement("p");desc.textContent=htmlText(item.spell.description||item.spell.tooltip||"Description unavailable.");card.appendChild(desc);
+      var tip=document.createElement("p");tip.className="ability-tip";tip.textContent="How to use it: "+item.tip;card.appendChild(tip);
+      if(item.spell.cooldown&&item.spell.cooldown.length){var cd=document.createElement("p");cd.className="ability-meta";cd.textContent="Base cooldown by rank: "+item.spell.cooldown.join(" / ")+" sec";card.appendChild(cd)}
+      root.appendChild(card);
+    });
+    var diff=data.info&&typeof data.info.difficulty==="number"?data.info.difficulty:null;
+    stats.textContent="";
+    var title=document.createElement("h3");title.textContent="Champion difficulty";stats.appendChild(title);
+    var p=document.createElement("p");p.textContent=diff===null?"Riot difficulty rating unavailable.":"Riot Data Dragon difficulty: "+diff+"/10 (champion learning complexity; not matchup difficulty).";stats.appendChild(p);
+    var link=document.createElement("a");link.href="https://u.gg/lol/champions/"+encodeURIComponent(name.toLowerCase().replace(/\s+/g,"-"))+"/build";link.target="_blank";link.rel="noopener noreferrer";link.textContent="Open current win rate, matchups and counters on U.GG ↗";link.className="stats-link";stats.appendChild(link);
+  }
+  function load(){
+    var current=Array.isArray(window.C)?window.C.find(function(c){return c&&c[0]===window.me?.[0]}):null;
+    var name=current?current[0]:(document.getElementById("ttl")?document.getElementById("ttl").textContent.replace(/^Playing\s+/,""):"");
+    if(!name)return;
+    var d=Object.values(championData).find(function(x){return x.name===name});
+    if(d){renderChampion(name);return}
+    fetch("https://ddragon.leagueoflegends.com/api/versions.json").then(function(r){return r.json()}).then(function(v){
+      statVersion=v[0];
+      return fetch("https://ddragon.leagueoflegends.com/cdn/"+statVersion+"/data/en_US/champion.json");
+    }).then(function(r){return r.json()}).then(function(index){
+      var entry=Object.values(index.data||{}).find(function(x){return x.name===name});
+      if(!entry)throw new Error("Champion not found");
+      return fetch("https://ddragon.leagueoflegends.com/cdn/"+statVersion+"/data/en_US/champion/"+entry.id+".json");
+    }).then(function(r){return r.json()}).then(function(detail){
+      Object.values(detail.data||{}).forEach(function(x){championData[safeName(x.name)]=x});
+      renderChampion(name);
+    }).catch(function(){
+      var root=document.getElementById("ability-content");
+      if(root)root.textContent="Could not load Riot champion data right now. Try again shortly.";
+    });
+  }
+  var style=document.createElement("style");
+  style.textContent="#ability-reference{margin-top:28px}.ability-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;margin-top:12px}.ability-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}.ability-card h3,.gd h3{margin:0 0 8px;color:var(--ac);font-size:1.15rem}.ability-card p{margin:8px 0}.ability-tip{border-top:1px solid var(--line);padding-top:8px}.ability-meta{color:var(--mut);font-size:.88rem}.stats-link{display:inline-block;color:var(--ac);font-weight:600;margin:4px 0}.ability-card{min-width:0}";
+  document.head.appendChild(style);
+  var oldChoose=window.choose;
+  if(typeof oldChoose==="function")window.choose=function(c){oldChoose(c);setTimeout(function(){renderChampion(c[0])},0)};
+  var oldDraw=window.draw;
+  if(typeof oldDraw==="function")window.draw=function(){oldDraw();if(window.me)setTimeout(function(){renderChampion(window.me[0])},0)};
+})();
+</script>
 </body></html>
