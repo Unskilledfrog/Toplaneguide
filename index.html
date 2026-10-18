@@ -64,6 +64,34 @@ dt{color:var(--mut);font-size:.9rem}dd{margin:0}
 
 /* Working champion guide panels */
 .champ-extra{margin-top:14px}.extra-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}.extra-card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;margin:8px 0}.extra-card h3{font:700 1.2rem "Barlow Condensed",sans-serif;margin:0 0 6px;color:#f6e8c7}.extra-card p{margin:5px 0}.extra-muted{color:var(--mut);font-size:.9rem}.extra-card a{color:var(--cool);overflow-wrap:anywhere}.spell-cooldowns{margin:10px 12px 12px}
+
+/* RiftGuide UX refresh: clearer hierarchy, calmer cards, responsive navigation */
+:root{--bg:#06111f;--fg:#edf4ff;--mut:#9db0c9;--card:rgba(10,27,47,.94);--line:#203c5b;--ac:#38a4ff;--cool:#66c4ff;--warm:#f2c66d;--hot:#ff6378}
+body{background:radial-gradient(ellipse at 50% -18%,rgba(24,91,158,.28),transparent 58%),var(--bg);line-height:1.48;letter-spacing:.005em}
+h1,h2,h3,.title,.brand{letter-spacing:.015em}
+button,select,input,textarea{font:inherit}
+button,.btn,a.button{transition:background .16s ease,border-color .16s ease,transform .16s ease}
+button:hover,.btn:hover{border-color:var(--ac);transform:translateY(-1px)}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--cool);outline-offset:3px}
+.card,.panel,.extra-card,.champ-extra{border-radius:12px}
+.extra-card{background:linear-gradient(145deg,rgba(13,35,60,.98),rgba(7,21,38,.98));border-color:#244564;box-shadow:0 8px 24px rgba(0,0,0,.12)}
+.extra-card h3{color:#eaf4ff}
+.extra-grid{gap:12px}
+.extra-card p,.extra-muted{line-height:1.55}
+.champ-extra{margin-top:18px}
+.spell-cooldowns{margin:12px 0 16px}
+#out{max-width:1500px;margin-inline:auto}
+#pick,#out,.wrap,main{min-width:0}
+@media(min-width:1100px){#out{padding-inline:clamp(14px,2vw,30px)}}
+@media(max-width:760px){
+ body{font-size:15px}
+ #out{padding:10px!important}
+ .extra-grid{grid-template-columns:1fr}
+ .extra-card{padding:11px}
+ button,select,input{min-height:42px}
+ h1{font-size:clamp(1.5rem,6vw,2rem)}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
 </style></head><body><div class="w">
 <h1 id="h1">Lane matchup guide</h1>
 <p class="sub" id="site-description">Ratings run from 1 (easiest matchup) to 10 (hardest). Pick your lane, then choose the champion you are playing. You get a guide for them, plus how to play them against every top laner, with runes and items.</p>
